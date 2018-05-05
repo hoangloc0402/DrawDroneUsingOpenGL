@@ -20,7 +20,6 @@ bool displayBody = false; //Biến xác định có hiển thị thân quạt ha
 bool displayEngine = false; //Biến xác định có hiển thị động cơ hay không, ấn "e" để thay đổi
 bool displayDome = false; //Biến xác định có hiển thị lưới quạt hay không, ấn "d" để thay đổi
 bool displayFanBlade = false; //Biến xác định có hiển thị cánh quạt hay không, ấn "f" để thay đổi
-
 					   //Các tham số điều chỉnh góc nhìn khi click kéo chuột
 int o_x, o_y;
 float eyeX, eyeY, eyeZ;
@@ -40,116 +39,15 @@ enum material {
 
 #pragma endregion
 
-//Vẽ trục toạ độ
-void drawAxis() {
-	glColor3f(0, 0, 1);
-	glBegin(GL_LINES);
-	glVertex3f(0, 0, 0);
-	glVertex3f(40, 0, 0);
-	glVertex3f(0, 0, 0);
-	glVertex3f(0, 40, 0);
-	glVertex3f(0, 0, 0);
-	glVertex3f(0, 0, 40);
-	glEnd();
+
+//Hàm set material
+#pragma region Material
+void applyMaterial(float ambient[], float diffuse[], float specular[], float shiness) {
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shiness);
 }
-
-//Các hàm callback
-#pragma region Callback Func
-void processTimer(int value) {
-	angle += (GLfloat)value / 5;
-	if (angle > 360.0f) angle -= 360.0f;
-	glutTimerFunc(25, processTimer, value);
-	glutPostRedisplay();
-}
-
-void onKeyboard(unsigned char key, int x, int y) {
-	switch (key) {
-	case '+':
-		fanSpeed += 4;
-		break;
-	case '-':
-		fanSpeed -= 4;
-		break;
-	case 's':
-		if (swing) swing = false;
-		else swing = true;
-		break;
-	case 'b':
-		if (displayBody) displayBody = false;
-		else displayBody = true;
-		break;
-	case 'd':
-		if (displayDome) displayDome = false;
-		else displayDome = true;
-		break;
-	case 'f':
-		if (displayFanBlade) displayFanBlade = false;
-		else displayFanBlade = true;
-		break;
-	case 'e':
-		if (displayEngine) displayEngine = false;
-		else displayEngine = true;
-		break;
-	case 'a':
-		displayBody = displayEngine = displayDome = displayFanBlade = true;
-		break;
-	default: break;
-	}
-	if (fanSpeed > 20) fanSpeed = 20;
-	if (fanSpeed < 0) fanSpeed = 0;
-	glutPostRedisplay();
-}
-
-void onSpecialKey(int key, int x, int y) {
-	switch (key) {
-
-	case GLUT_KEY_PAGE_UP:		// Zoom in
-		orthorScaler -= 0.2;
-		break;
-	case GLUT_KEY_PAGE_DOWN:	// Zoom out
-		orthorScaler += 0.2;
-		break;
-	case GLUT_KEY_UP:
-		beta -= deltaAngle;
-		break;
-	case GLUT_KEY_DOWN:
-		beta += deltaAngle;
-		break;
-	case GLUT_KEY_LEFT:
-		alpha -= deltaAngle;
-		break;
-	case GLUT_KEY_RIGHT:
-		alpha += deltaAngle;
-		break;
-	default:
-		break;
-	}
-	if (orthorScaler > 10) orthorScaler = 10;
-	if (orthorScaler < 0.5) orthorScaler = 0.5;
-	glutPostRedisplay();
-}
-
-void onReshape(int w, int h) {
-	int size = min(w, h);
-	glViewport(0, 0, size, size);
-}
-
-void onMouseDown(int button, int state, int x, int y) {
-	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-		o_x = x;
-		o_y = y;
-	}
-}
-
-void onMotion(int x, int y) {
-	alpha += (x - o_x) / 2;
-	beta += (y - o_y) / 2;
-	o_x = x;
-	o_y = y;
-	glutPostRedisplay();
-}
-
-#pragma endregion
 
 void setMaterial(material myMaterial) {
 	float mat_ambient[4];
@@ -364,13 +262,120 @@ void setMaterial(material myMaterial) {
 		break;
 	}
 }
+#pragma endregion
 
-void applyMaterial(float ambient[], float diffuse[], float specular[], float shiness) {
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shiness);
+
+//Vẽ trục toạ độ
+void drawAxis() {
+	glColor3f(0, 0, 1);
+	glBegin(GL_LINES);
+	glVertex3f(0, 0, 0);
+	glVertex3f(40, 0, 0);
+	glVertex3f(0, 0, 0);
+	glVertex3f(0, 40, 0);
+	glVertex3f(0, 0, 0);
+	glVertex3f(0, 0, 40);
+	glEnd();
 }
+
+//Các hàm callback
+#pragma region Callback Func
+void processTimer(int value) {
+	angle += (GLfloat)value / 5;
+	if (angle > 360.0f) angle -= 360.0f;
+	glutTimerFunc(25, processTimer, value);
+	glutPostRedisplay();
+}
+
+void onKeyboard(unsigned char key, int x, int y) {
+	switch (key) {
+	case '+':
+		fanSpeed += 4;
+		break;
+	case '-':
+		fanSpeed -= 4;
+		break;
+	case 's':
+		if (swing) swing = false;
+		else swing = true;
+		break;
+	case 'b':
+		if (displayBody) displayBody = false;
+		else displayBody = true;
+		break;
+	case 'd':
+		if (displayDome) displayDome = false;
+		else displayDome = true;
+		break;
+	case 'f':
+		if (displayFanBlade) displayFanBlade = false;
+		else displayFanBlade = true;
+		break;
+	case 'e':
+		if (displayEngine) displayEngine = false;
+		else displayEngine = true;
+		break;
+	case 'a':
+		displayBody = displayEngine = displayDome = displayFanBlade = true;
+		break;
+	default: break;
+	}
+	if (fanSpeed > 20) fanSpeed = 20;
+	if (fanSpeed < 0) fanSpeed = 0;
+	glutPostRedisplay();
+}
+
+void onSpecialKey(int key, int x, int y) {
+	switch (key) {
+
+	case GLUT_KEY_PAGE_UP:		// Zoom in
+		orthorScaler -= 0.2;
+		break;
+	case GLUT_KEY_PAGE_DOWN:	// Zoom out
+		orthorScaler += 0.2;
+		break;
+	case GLUT_KEY_UP:
+		beta -= deltaAngle;
+		break;
+	case GLUT_KEY_DOWN:
+		beta += deltaAngle;
+		break;
+	case GLUT_KEY_LEFT:
+		alpha -= deltaAngle;
+		break;
+	case GLUT_KEY_RIGHT:
+		alpha += deltaAngle;
+		break;
+	default:
+		break;
+	}
+	if (orthorScaler > 10) orthorScaler = 10;
+	if (orthorScaler < 0.5) orthorScaler = 0.5;
+	glutPostRedisplay();
+}
+
+void onReshape(int w, int h) {
+	int size = min(w, h);
+	glViewport(0, 0, size, size);
+}
+
+void onMouseDown(int button, int state, int x, int y) {
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+		o_x = x;
+		o_y = y;
+	}
+}
+
+void onMotion(int x, int y) {
+	alpha += (x - o_x) / 2;
+	beta += (y - o_y) / 2;
+	o_x = x;
+	o_y = y;
+	glutPostRedisplay();
+}
+
+#pragma endregion
+
 
 void view() {
 	glMatrixMode(GL_MODELVIEW);
