@@ -439,6 +439,14 @@ void initialize() {
 	upZ = 0;
 }
 
+void drawCameraLens() {
+	Mesh camLens;
+	camLens.DrawCameraLens();
+	camLens.CalculateFacesNorm();
+	setMaterial(whiteplastic);
+	camLens.Draw();
+}
+
 void myDisplay() {
 	initOpenGL();
 	initialize();
@@ -448,6 +456,35 @@ void myDisplay() {
 	glClearColor(1, 1, 1, 1);
 	drawAxis();
 	glViewport(0, 0, screenWidth, screenHeight);
+
+	GLfloat	lightDiffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	GLfloat	lightSpecular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	GLfloat	lightAmbient[] = { 0.4f, 0.4f, 0.4f, 1.0f };
+	GLfloat light_position[] = { 1.0f, 1.0f, 1.0f, 0.0f };
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	GLfloat	lightDiffuse1[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	GLfloat	lightSpecular1[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	GLfloat	lightAmbient1[] = { 0.4f, 0.4f, 0.4f, 1.0f };
+	GLfloat light_position1[] = { 1.0f, 1.0f, -1.0f, 0.0f };
+	glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular1);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT1);
+
+	//drawCameraLens();
+
+	Mesh heli;
+	heli.CreateHeliFace(83);
+	heli.CalculateFacesNorm();
+	setMaterial(bronze);
+	heli.Draw();
 
 
 	glFlush();

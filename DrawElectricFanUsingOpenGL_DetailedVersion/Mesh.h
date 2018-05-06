@@ -69,7 +69,8 @@ public:
 	
 		void Draw();
 		void CalculateFacesNorm();
-
+		void DrawCameraLens();
+		void CreateHeliFace(int numVertexEachEdge);
 	};
 
 #endif
