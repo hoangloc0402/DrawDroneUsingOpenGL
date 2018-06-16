@@ -292,12 +292,13 @@ void setMaterial(material myMaterial) {
 
 //Vẽ trục toạ độ
 void drawAxis() {
-	glColor3f(0, 0, 1);
 	glBegin(GL_LINES);
 	glVertex3f(0, 0, 0);
 	glVertex3f(40, 0, 0);
+	setMaterial(blackplastic);
 	glVertex3f(0, 0, 0);
 	glVertex3f(0, 40, 0);
+	setMaterial(emerald);
 	glVertex3f(0, 0, 0);
 	glVertex3f(0, 0, 40);
 	glEnd();
@@ -481,11 +482,14 @@ void myDisplay() {
 	//drawCameraLens();
 
 	Mesh heli;
-	heli.CreateHeliFace(83);
+	heli.CreateHeliFace(20);
 	heli.CalculateFacesNorm();
 	setMaterial(bronze);
-	heli.Draw();
-
+	glPushMatrix();
+		glTranslatef(0, 1, 0);
+		glRotatef(90, 0, 0, 1);
+		heli.Draw();
+	glPopMatrix();
 
 	glFlush();
 	glutSwapBuffers();
