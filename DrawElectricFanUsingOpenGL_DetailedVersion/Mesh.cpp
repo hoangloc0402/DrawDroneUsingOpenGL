@@ -84,7 +84,7 @@ void Mesh::CreateHeliFace(int numVertexEachEdge) {
 	}
 }
 
-void Mesh::CreateHeliTailPivot(int length, int solidity, float rX, float rY) {
+void Mesh::CreateEclipseCylinder(int length, int solidity, float rX, float rY) {
 	numVerts = solidity * 2;
 	pt = new Point3[numVerts];
 	double radStep = 360*DEG2RAD / solidity;
@@ -112,6 +112,67 @@ void Mesh::CreateHeliTailPivot(int length, int solidity, float rX, float rY) {
 
 	CalculateFacesNorm();
 }
+
+void Mesh::CreateHoleCylinder(float height, int solidity, float radiusInside, float radiusOutside1, float radiusOutside2) {
+
+	numVerts = solidity * 4;
+	pt = new Point3[numVerts];
+	double radStep = 360 * DEG2RAD / solidity;
+	for (int i = 0; i < solidity; i++) {
+		pt[i].x = radiusOutside1 * cos(i*radStep);
+		pt[i].y = 0;
+		pt[i].z = radiusOutside1 * sin(i*radStep);
+
+		pt[i + solidity].x = radiusOutside2 * cos(i*radStep);
+		pt[i + solidity].y = height;
+		pt[i + solidity].z = radiusOutside2 * sin(i*radStep);
+
+		pt[i + 3 * solidity].x = pt[i + 2 * solidity].x = radiusInside * cos(i*radStep);
+		pt[i + 2 * solidity].y = 0;
+		pt[i + 3 * solidity].y = height;
+		pt[i + 3 * solidity].z = pt[i + 2 * solidity].z = radiusInside * sin(i*radStep);
+	}
+
+	numFaces = 4 * solidity;
+	face = new Face[numFaces];
+
+	for (int i = 0; i < solidity; i++) {
+		face[i].nVerts = 4;
+		face[i].vert = new VertexID[4];
+		face[i].vert[0].vertIndex = i;
+		face[i].vert[1].vertIndex = (i + 1) % solidity;
+		face[i].vert[2].vertIndex = (i + 1) % solidity + solidity;
+		face[i].vert[3].vertIndex = i + solidity;
+
+		int a, b, c;
+		a = i + solidity;
+		face[a].nVerts = 4;
+		face[a].vert = new VertexID[4];
+		face[a].vert[0].vertIndex = i + 2*solidity;
+		face[a].vert[3].vertIndex = (i + 1) % solidity + 2*solidity;
+		face[a].vert[2].vertIndex = (i + 1) % solidity + solidity + 2*solidity;
+		face[a].vert[1].vertIndex = i + solidity + 2*solidity;
+
+		b = i + 2 * solidity;
+		face[b].nVerts = 4;
+		face[b].vert = new VertexID[4];
+		face[b].vert[0].vertIndex = i ;
+		face[b].vert[1].vertIndex = (i + 1) % solidity;
+		face[b].vert[2].vertIndex = (i + 1) % solidity + 2 * solidity;
+		face[b].vert[3].vertIndex = i + 2 * solidity;
+
+		c = i + 3 * solidity;
+		face[c].nVerts = 4;
+		face[c].vert = new VertexID[4];
+		face[c].vert[0].vertIndex = i +  solidity;
+		face[c].vert[1].vertIndex = (i + 1) % solidity +  solidity;
+		face[c].vert[2].vertIndex = (i + 1) % solidity  + 3 * solidity;
+		face[c].vert[3].vertIndex = i + 3 * solidity;
+	}
+
+	CalculateFacesNorm();
+}
+
 
 void Mesh::DrawCameraLens() {
 	float lenHeight = 0.5f;

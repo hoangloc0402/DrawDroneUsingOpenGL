@@ -448,6 +448,43 @@ void drawCameraLens() {
 	camLens.Draw();
 }
 
+void drawTailFanBlade(float angle) {
+
+}
+
+void drawHeliTail() {
+	/*Mesh bigTailPivot, smallTailPivot;
+	bigTailPivot.CreateEclipseCylinder(2, 360, 0.2, 0.15);
+	smallTailPivot.CreateEclipseCylinder(2, 360, 0.1, 0.075);
+	glPushMatrix(); {
+		glRotatef(90, 1, 0, 0);
+		bigTailPivot.Draw();
+		glTranslatef(0, 0, -0.15);
+		glRotatef(90, 0, 1, 0);
+		smallTailPivot.Draw();
+	}	
+	glPopMatrix();*/
+
+	Mesh tailFanPivot;
+	Mesh tailFanBox1, tailFanBox2, tailFanBox3;
+	tailFanPivot.CreateHoleCylinder(0.2, 360, 0, 0.15, 0.15);
+	tailFanBox1.CreateHoleCylinder(0.15, 360, 0.4, 0.6, 0.5);
+	tailFanBox2.CreateHoleCylinder(0.05, 360, 0.4, 0.6, 0.6);
+	tailFanBox3.CreateHoleCylinder(0.15, 360, 0.4, 0.5, 0.6);
+	glPushMatrix(); {
+
+		tailFanBox1.Draw();
+		glTranslatef(0, -0.05, 0);
+		tailFanBox2.Draw();
+		glTranslatef(0, -0.15, 0);
+		tailFanBox3.Draw();
+		glTranslatef(0, 0.05, 0);
+		tailFanPivot.Draw();
+	}
+	glPopMatrix();
+
+}
+
 void myDisplay() {
 	initOpenGL();
 	initialize();
@@ -483,21 +520,12 @@ void myDisplay() {
 
 	drawHeliTail();
 
+	
+
 	glFlush();
 	glutSwapBuffers();
 }
 
-void drawHeliTail() {
-	Mesh bigTailPivot, smallTailPivot;
-	bigTailPivot.CreateHeliTailPivot(2, 360, 0.2, 0.15);
-	smallTailPivot.CreateHeliTailPivot(2, 360, 0.1, 0.075);
-	glPushMatrix();
-	bigTailPivot.Draw();
-	glTranslatef(0, 0, 0.15);
-	glRotatef(90, 0, 1, 0);
-	smallTailPivot.Draw();
-	glPopMatrix();
-}
 
 int main(int argc, CHAR* argv[]) {
 
