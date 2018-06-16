@@ -114,7 +114,6 @@ void Mesh::CreateEclipseCylinder(int length, int solidity, float rX, float rY) {
 }
 
 void Mesh::CreateHoleCylinder(float height, int solidity, float radiusInside, float radiusOutside1, float radiusOutside2) {
-
 	numVerts = solidity * 4;
 	pt = new Point3[numVerts];
 	double radStep = 360 * DEG2RAD / solidity;
@@ -173,6 +172,66 @@ void Mesh::CreateHoleCylinder(float height, int solidity, float radiusInside, fl
 	CalculateFacesNorm();
 }
 
+void Mesh:: CreatePanel(float length, float width, float thickness1, float thickness2) {
+	numVerts = 8;
+	pt = new Point3[numVerts];
+	pt[0].set(0, thickness1 / 2, 0);
+	pt[1].set(length, thickness1 / 2, 0);
+	pt[2].set(length, thickness2 / 2, width);
+	pt[3].set(0, thickness2 / 2, width);
+	pt[4].set(0, -thickness1 / 2, 0);
+	pt[5].set(length, -thickness1 / 2, 0);
+	pt[6].set(length, -thickness2 / 2, width);
+	pt[7].set(0, -thickness2 / 2, width);
+
+	numFaces = 6;
+	face = new Face[numFaces];
+
+	face[1].nVerts = 4;
+	face[1].vert = new VertexID[4];
+	face[1].vert[0].vertIndex = 0;
+	face[1].vert[1].vertIndex = 1;
+	face[1].vert[2].vertIndex = 2;
+	face[1].vert[3].vertIndex = 3;
+
+	face[2].nVerts = 4;
+	face[2].vert = new VertexID[4];
+	face[2].vert[0].vertIndex = 4;
+	face[2].vert[1].vertIndex = 7;
+	face[2].vert[2].vertIndex = 6;
+	face[2].vert[3].vertIndex = 5;
+	
+	face[3].nVerts = 4;
+	face[3].vert = new VertexID[4];
+	face[3].vert[0].vertIndex = 0;
+	face[3].vert[1].vertIndex = 4;
+	face[3].vert[2].vertIndex = 5;
+	face[3].vert[3].vertIndex = 1;
+
+	face[4].nVerts = 4;
+	face[4].vert = new VertexID[4];
+	face[4].vert[0].vertIndex = 1;
+	face[4].vert[1].vertIndex = 5;
+	face[4].vert[2].vertIndex = 6;
+	face[4].vert[3].vertIndex = 2;
+
+	face[5].nVerts = 4;
+	face[5].vert = new VertexID[4];
+	face[5].vert[0].vertIndex = 2;
+	face[5].vert[1].vertIndex = 6;
+	face[5].vert[2].vertIndex = 7;
+	face[5].vert[3].vertIndex = 3;
+
+	face[0].nVerts = 4;
+	face[0].vert = new VertexID[4];
+	face[0].vert[0].vertIndex = 3;
+	face[0].vert[1].vertIndex = 7;
+	face[0].vert[2].vertIndex = 4;
+	face[0].vert[3].vertIndex = 0;
+
+	CalculateFacesNorm();
+
+}
 
 void Mesh::DrawCameraLens() {
 	float lenHeight = 0.5f;

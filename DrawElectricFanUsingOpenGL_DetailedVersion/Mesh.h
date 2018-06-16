@@ -73,6 +73,7 @@ public:
 		void CreateHeliFace(int numVertexEachEdge);
 		void CreateEclipseCylinder(int length, int solidity, float rX, float rY);
 		void CreateHoleCylinder(float height, int solidity, float radiusInside, float radiusOutside1, float radiusOutside2);
+		void CreatePanel(float length, float width, float thickness1, float thickness2);
 	};
 
 #endif

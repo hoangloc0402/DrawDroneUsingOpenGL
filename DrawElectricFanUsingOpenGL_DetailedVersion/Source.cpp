@@ -449,40 +449,94 @@ void drawCameraLens() {
 }
 
 void drawTailFanBlade(float angle) {
-
+	glPushMatrix(); {
+		Mesh blade;
+		glRotatef(angle, 0, 1, 0);
+		glTranslated(0, 0.12, 0);
+		glRotatef(-45, 1, 0, 0);
+		glTranslated(0, 0, -0.1);
+		setMaterial(silver);
+		blade.CreatePanel(0.45, 0.15, 0.015, 0.02);
+		blade.Draw();
+	}
+	glPopMatrix();
 }
 
-void drawHeliTail() {
-	/*Mesh bigTailPivot, smallTailPivot;
-	bigTailPivot.CreateEclipseCylinder(2, 360, 0.2, 0.15);
-	smallTailPivot.CreateEclipseCylinder(2, 360, 0.1, 0.075);
+void drawTailSwing() {
+	Mesh swingPart1, swingPart2;
+	swingPart1.CreatePanel(0.5, 0.15, 0.06, 0.02);
+	swingPart2.CreatePanel(0.3, 0.15, 0.04, 0.02);
 	glPushMatrix(); {
-		glRotatef(90, 1, 0, 0);
-		bigTailPivot.Draw();
-		glTranslatef(0, 0, -0.15);
-		glRotatef(90, 0, 1, 0);
-		smallTailPivot.Draw();
-	}	
-	glPopMatrix();*/
+		swingPart1.Draw();
+		glTranslatef(0.45, 0, 0);
+		glTranslatef(-0.05, -0.1, 0);
+		glRotatef(45, 0, 0, 1);
+		swingPart2.Draw();
+	}
+	glPopMatrix();
+}
 
+void drawTailFanBox() {
 	Mesh tailFanPivot;
 	Mesh tailFanBox1, tailFanBox2, tailFanBox3;
 	tailFanPivot.CreateHoleCylinder(0.2, 360, 0, 0.15, 0.15);
-	tailFanBox1.CreateHoleCylinder(0.15, 360, 0.4, 0.6, 0.5);
-	tailFanBox2.CreateHoleCylinder(0.05, 360, 0.4, 0.6, 0.6);
-	tailFanBox3.CreateHoleCylinder(0.15, 360, 0.4, 0.5, 0.6);
+	tailFanBox1.CreateHoleCylinder(0.2, 360, 0.5, 0.7, 0.6);
+	tailFanBox2.CreateHoleCylinder(0.1, 360, 0.5, 0.7, 0.7);
+	tailFanBox3.CreateHoleCylinder(0.2, 360, 0.5, 0.6, 0.7);
 	glPushMatrix(); {
-
-		tailFanBox1.Draw();
-		glTranslatef(0, -0.05, 0);
-		tailFanBox2.Draw();
-		glTranslatef(0, -0.15, 0);
-		tailFanBox3.Draw();
 		glTranslatef(0, 0.05, 0);
+		tailFanBox1.Draw();
+		glTranslatef(0, -0.1, 0);
+		tailFanBox2.Draw();
+
+		glTranslatef(0, -0.2, 0);
+		tailFanBox3.Draw();
+
+		glTranslatef(0, 0.15, 0);
 		tailFanPivot.Draw();
+
+		for (int i = 0; i < 360; i += 45)
+			drawTailFanBlade(i);
+	}
+	glPopMatrix();
+}
+
+void drawTailPivot() {
+	Mesh bigTailPivot, smallTailPivot;
+	bigTailPivot.CreateEclipseCylinder(2.5, 360, 0.18, 0.15);
+	smallTailPivot.CreateEclipseCylinder(2.5, 360, 0.1, 0.05);
+	glPushMatrix(); {
+	glTranslatef(0, 0, 1);
+	glRotatef(90, 1, 0, 0);
+	bigTailPivot.Draw();
+	glTranslatef(0, 0, -0.12);
+	glRotatef(90, 0, 1, 0);
+	smallTailPivot.Draw();
+	}
+	glPopMatrix();
+}
+
+void drawHeliTail() {
+	glPopMatrix(); {
+		glRotatef(90, 0, 0, 1);
+		drawTailFanBox();
+		glRotatef(-90, 0, 0, 1);
+		glTranslatef(0, 0, -0.35);
+		drawTailPivot();
 	}
 	glPopMatrix();
 
+	glPushMatrix(); {
+		glTranslatef(0, 0, 1.4);
+		drawTailSwing();
+		glScalef(-1, 1, 1);
+		drawTailSwing();
+		glScalef(1, 1, -1);
+		drawTailSwing();
+		glScalef(-1, 1, 1);
+		drawTailSwing();
+	}
+	glPopMatrix();
 }
 
 void myDisplay() {
