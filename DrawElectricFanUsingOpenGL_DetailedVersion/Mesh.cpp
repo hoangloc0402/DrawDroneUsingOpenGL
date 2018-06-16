@@ -84,6 +84,35 @@ void Mesh::CreateHeliFace(int numVertexEachEdge) {
 	}
 }
 
+void Mesh::CreateHeliTailPivot(int length, int solidity, float rX, float rY) {
+	numVerts = solidity * 2;
+	pt = new Point3[numVerts];
+	double radStep = 360*DEG2RAD / solidity;
+	for (int i = 0; i < solidity; i++) {
+		pt[i].x = rX*cos(radStep *i);
+		pt[i].y = 0;
+		pt[i].z = rY*sin(radStep*i);
+
+		pt[i + solidity].x = pt[i].x;
+		pt[i + solidity].y = length;
+		pt[i + solidity].z = pt[i].z;
+	}
+
+	numFaces =  solidity;
+	face = new Face[numFaces];
+	for (int i = 0; i < solidity; i++) {
+		face[i].nVerts = 4;
+		face[i].vert = new VertexID[4];
+
+		face[i].vert[0].vertIndex = i;
+		face[i].vert[1].vertIndex = (i + 1) % solidity;
+		face[i].vert[2].vertIndex = (i + 1) % solidity + solidity ;
+		face[i].vert[3].vertIndex = i + solidity;
+	}
+
+	CalculateFacesNorm();
+}
+
 void Mesh::DrawCameraLens() {
 	float lenHeight = 0.5f;
 	float lenRadius = 1.0f;

@@ -71,6 +71,7 @@ public:
 		void CalculateFacesNorm();
 		void DrawCameraLens();
 		void CreateHeliFace(int numVertexEachEdge);
+		void CreateHeliTailPivot(int length, int solidity, float rX, float rY);
 	};
 
 #endif

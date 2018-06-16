@@ -481,18 +481,22 @@ void myDisplay() {
 
 	//drawCameraLens();
 
-	Mesh heli;
-	heli.CreateHeliFace(20);
-	heli.CalculateFacesNorm();
-	setMaterial(bronze);
-	glPushMatrix();
-		glTranslatef(0, 1, 0);
-		glRotatef(90, 0, 0, 1);
-		heli.Draw();
-	glPopMatrix();
+	drawHeliTail();
 
 	glFlush();
 	glutSwapBuffers();
+}
+
+void drawHeliTail() {
+	Mesh bigTailPivot, smallTailPivot;
+	bigTailPivot.CreateHeliTailPivot(2, 360, 0.2, 0.15);
+	smallTailPivot.CreateHeliTailPivot(2, 360, 0.1, 0.075);
+	glPushMatrix();
+	bigTailPivot.Draw();
+	glTranslatef(0, 0, 0.15);
+	glRotatef(90, 0, 1, 0);
+	smallTailPivot.Draw();
+	glPopMatrix();
 }
 
 int main(int argc, CHAR* argv[]) {
