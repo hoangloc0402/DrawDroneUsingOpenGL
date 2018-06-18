@@ -115,11 +115,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MaterialColor.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="supportClass.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MaterialColor.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="supportClass.h" />
   </ItemGroup>
