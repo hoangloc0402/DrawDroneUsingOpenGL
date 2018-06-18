@@ -590,10 +590,10 @@ void myDisplay() {
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 
-	GLfloat	lightDiffuse1[] = {0.7f,  0.7f,  0.7f,  1.0f };
-	GLfloat	lightSpecular1[] = { 0.7f,  0.7f,  0.7f,  1.0f };
-	GLfloat	lightAmbient1[] = { 0.4f,  0.4f,  0.4f,  1.0f };
-	GLfloat light_position1[] = { 6.0f, 0.0f, 0.0f, 1.0f };
+	GLfloat	lightDiffuse1[] = {0.7f,  0.7f,  0.7f,  0.2f };
+	GLfloat	lightSpecular1[] = { 0.7f,  0.7f,  0.7f,  0.8f };
+	GLfloat	lightAmbient1[] = { 0.4f,  0.4f,  0.4f,  0.6f };
+	GLfloat light_position1[] = { 6.0f, 0.0f, 0.0f, 0.3f };
 	glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
 	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
@@ -601,10 +601,10 @@ void myDisplay() {
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT1);
 
-	GLfloat	lightDiffuse2[] = { 0.3f,  0.3f, 0.3f,  1.0f };
-	GLfloat	lightSpecular2[] = { 0.3f,  0.3f, 0.3f,  1.0f };
-	GLfloat	lightAmbient2[] = { 0.4f,  0.4f,  0.4f,  1.0f };
-	GLfloat light_position2[] = { 0.0f, 6.0f, 0.0f, 1.0f };
+	GLfloat	lightDiffuse2[] = { 0.3f,  0.3f, 0.3f,  0.5f };
+	GLfloat	lightSpecular2[] = { 0.3f,  0.3f, 0.3f,  .20f };
+	GLfloat	lightAmbient2[] = { 0.4f,  0.4f,  0.4f,  0.3f };
+	GLfloat light_position2[] = { 0.0f, 6.0f, 0.0f, 0.8f };
 	glLightfv(GL_LIGHT2, GL_POSITION, light_position2);
 	glLightfv(GL_LIGHT2, GL_DIFFUSE, lightDiffuse2);
 	glLightfv(GL_LIGHT2, GL_AMBIENT, lightAmbient2);
