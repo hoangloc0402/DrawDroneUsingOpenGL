@@ -23,6 +23,9 @@ float deltaAngle = 5;
 float dR = 0.2;
 float Radius = 4;
 
+Point3 L;
+int theta;
+
 //Vẽ trục toạ độ
 void drawAxis() {
 	glBegin(GL_LINES);
@@ -54,6 +57,27 @@ void onKeyboard(unsigned char key, int x, int y) {
 	case '-':
 		smallBladeSpeed -= 2;
 		break;
+	case '5':
+		L.z += 0.1*cos(theta*DEG2RAD);
+		L.x += 0.1*sin(theta*DEG2RAD);
+		break;
+	case '2':
+		L.z -= 0.1*cos(theta*DEG2RAD);
+		L.x -= 0.1*sin(theta*DEG2RAD);
+		break;
+	case '1':
+		theta += 1;
+		break;
+	case '3':
+		theta -= 1;
+		break;
+	case '4':
+		L.y += 0.1;
+		break;
+	case '6':
+		L.y -= 0.1;
+		break;
+
 	default:break;
 	}
 
@@ -298,6 +322,8 @@ void myDisplay() {
 	//drawCameraLens();
 	drawAxis();
 
+	glTranslatef(L.x, L.y, L.z);
+	glRotatef(theta, 0, 1, 0);
 	drawHeliTail();
 
 	glFlush();
@@ -320,6 +346,8 @@ int main(int argc, CHAR* argv[]) {
 	glutReshapeFunc(onReshape);
 	glutMotionFunc(onMotion);
 	glutMouseFunc(onMouseDown);
+
+	L.set(0, 0, 0);
 
 	glutMainLoop();
 	return 0;
