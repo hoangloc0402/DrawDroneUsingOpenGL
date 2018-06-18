@@ -74,6 +74,8 @@ public:
 		void CreateEclipseCylinder(int length, int solidity, float rX, float rY);
 		void CreateHoleCylinder(float height, int solidity, float radiusInside, float radiusOutside1, float radiusOutside2);
 		void CreatePanel(float length, float width, float thickness1, float thickness2);
+		void CreateFlag(float X2, float X3, float X4, float Z3, float Z4, float thickness1, float thickness2);
+		void CreateStar();
 	};
 
 #endif

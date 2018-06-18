@@ -516,6 +516,27 @@ void drawTailPivot() {
 	glPopMatrix();
 }
 
+void drawTailFlag() {
+	glPushMatrix();
+	Mesh tailFlag;
+	Mesh star;
+	tailFlag.CreateFlag(0.4, 0.25, 0.5, 0.3, 0.32, 0.07, 0.02);
+	star.CreateStar();
+	glPushMatrix(); {
+		glScalef(-1, 1, 1);
+		glRotatef(-90, 1, 0, 0);
+		setMaterial(redplastic);
+		tailFlag.Draw();
+	}
+	glPopMatrix();
+	setMaterial(gold);
+	glTranslatef(-0.43, 0.3, 0);
+	glRotatef(90, 1, 0, 0);
+	glScalef(0.001, 0.0015, 0.001);
+	star.Draw();
+	glPopMatrix();
+}
+
 void drawHeliTail() {
 	glPopMatrix(); {
 		glRotatef(90, 0, 0, 1);
@@ -537,6 +558,15 @@ void drawHeliTail() {
 		drawTailSwing();
 	}
 	glPopMatrix();
+
+	glPushMatrix(); {
+		glTranslatef(0, 0.5, 0.75);
+		glRotatef(-90, 0, 1, 0);
+		glScalef(2, 2, 2);
+		drawTailFlag();
+	}
+	glPopMatrix();
+	
 }
 
 void myDisplay() {
@@ -549,26 +579,38 @@ void myDisplay() {
 	drawAxis();
 	glViewport(0, 0, screenWidth, screenHeight);
 
-	GLfloat	lightDiffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	GLfloat	lightSpecular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	GLfloat	lightAmbient[] = { 0.4f, 0.4f, 0.4f, 1.0f };
-	GLfloat light_position[] = { 1.0f, 1.0f, 1.0f, 0.0f };
+	GLfloat	lightDiffuse[] = { 0.6f,  0.6f,  0.6f,  1.0f };
+	GLfloat	lightSpecular[] = { 0.6f,  0.6f,  0.6f,  1.0f };
+	GLfloat	lightAmbient[] = { 0.4f,  0.4f,  0.4f,  1.0f };
+	GLfloat light_position[] = {3.0f, 3.0f, 3.0f, 1.0f };
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	GLfloat	lightDiffuse1[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	GLfloat	lightSpecular1[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	GLfloat	lightAmbient1[] = { 0.4f, 0.4f, 0.4f, 1.0f };
-	GLfloat light_position1[] = { 1.0f, 1.0f, -1.0f, 0.0f };
+
+	GLfloat	lightDiffuse1[] = {0.7f,  0.7f,  0.7f,  1.0f };
+	GLfloat	lightSpecular1[] = { 0.7f,  0.7f,  0.7f,  1.0f };
+	GLfloat	lightAmbient1[] = { 0.4f,  0.4f,  0.4f,  1.0f };
+	GLfloat light_position1[] = { 6.0f, 0.0f, 0.0f, 1.0f };
 	glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
 	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
 	glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular1);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT1);
+
+	GLfloat	lightDiffuse2[] = { 0.3f,  0.3f, 0.3f,  1.0f };
+	GLfloat	lightSpecular2[] = { 0.3f,  0.3f, 0.3f,  1.0f };
+	GLfloat	lightAmbient2[] = { 0.4f,  0.4f,  0.4f,  1.0f };
+	GLfloat light_position2[] = { 0.0f, 6.0f, 0.0f, 1.0f };
+	glLightfv(GL_LIGHT2, GL_POSITION, light_position2);
+	glLightfv(GL_LIGHT2, GL_DIFFUSE, lightDiffuse2);
+	glLightfv(GL_LIGHT2, GL_AMBIENT, lightAmbient2);
+	glLightfv(GL_LIGHT2, GL_SPECULAR, lightSpecular2);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT2);
 
 	//drawCameraLens();
 

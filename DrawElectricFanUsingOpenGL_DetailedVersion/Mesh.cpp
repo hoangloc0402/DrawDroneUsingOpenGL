@@ -230,7 +230,248 @@ void Mesh:: CreatePanel(float length, float width, float thickness1, float thick
 	face[0].vert[3].vertIndex = 0;
 
 	CalculateFacesNorm();
+}
 
+void Mesh::CreateFlag(float X2, float X3, float X4, float Z3, float Z4, float thickness1, float thickness2) {
+	numVerts = 8;
+	pt = new Point3[numVerts];
+	pt[0].set(0, thickness1 / 2, 0);
+	pt[1].set(X2, thickness1 / 2, 0);
+	pt[2].set(X4, thickness2 / 2, Z4);
+	pt[3].set(X3, thickness2 / 2, Z3);
+	pt[4].set(0, -thickness1 / 2, 0);
+	pt[5].set(X2, -thickness1 / 2, 0);
+	pt[6].set(X4, -thickness2 / 2,Z4);
+	pt[7].set(X3, -thickness2 / 2, Z3);
+
+	numFaces = 6;
+	face = new Face[numFaces];
+
+	face[1].nVerts = 4;
+	face[1].vert = new VertexID[4];
+	face[1].vert[3].vertIndex = 0;
+	face[1].vert[2].vertIndex = 1;
+	face[1].vert[1].vertIndex = 2;
+	face[1].vert[0].vertIndex = 3;
+
+	face[2].nVerts = 4;
+	face[2].vert = new VertexID[4];
+	face[2].vert[3].vertIndex = 4;
+	face[2].vert[2].vertIndex = 7;
+	face[2].vert[1].vertIndex = 6;
+	face[2].vert[0].vertIndex = 5;
+
+	face[3].nVerts = 4;
+	face[3].vert = new VertexID[4];
+	face[3].vert[0].vertIndex = 0;
+	face[3].vert[1].vertIndex = 4;
+	face[3].vert[2].vertIndex = 5;
+	face[3].vert[3].vertIndex = 1;
+
+	face[4].nVerts = 4;
+	face[4].vert = new VertexID[4];
+	face[4].vert[0].vertIndex = 1;
+	face[4].vert[1].vertIndex = 5;
+	face[4].vert[2].vertIndex = 6;
+	face[4].vert[3].vertIndex = 2;
+
+	face[5].nVerts = 4;
+	face[5].vert = new VertexID[4];
+	face[5].vert[3].vertIndex = 2;
+	face[5].vert[2].vertIndex = 6;
+	face[5].vert[1].vertIndex = 7;
+	face[5].vert[0].vertIndex = 3;
+
+	face[0].nVerts = 4;
+	face[0].vert = new VertexID[4];
+	face[0].vert[3].vertIndex = 3;
+	face[0].vert[2].vertIndex = 7;
+	face[0].vert[1].vertIndex = 4;
+	face[0].vert[0].vertIndex = 0;
+
+	CalculateFacesNorm();
+}
+
+void Mesh::CreateStar() {
+	numVerts = 20;
+	pt = new Point3[numVerts];
+	pt[0].set(107, 20, 10);
+	pt[1].set(130, 20, 78);
+	pt[2].set(205, 20, 78);
+	pt[3].set(144, 20, 122);
+	pt[4].set(166, 20, 193);
+	pt[5].set(108, 20, 152);
+	pt[6].set(44, 20, 193);
+	pt[7].set(68, 20, 123);
+	pt[8].set(10, 20, 79);
+	pt[9].set(84, 20, 77);
+
+	pt[10].set(107, -20, 10);
+	pt[11].set(130, -20, 78);
+	pt[12].set(205, -20, 78);
+	pt[13].set(144, -20, 122);
+	pt[14].set(166, -20, 193);
+	pt[15].set(108, -20, 152);
+	pt[16].set(44, -20, 193);
+	pt[17].set(68, -20, 123);
+	pt[18].set(10, -20, 79);
+	pt[19].set(84, -20, 77);
+
+
+	numFaces = 22;
+	face = new Face[numFaces];
+	{
+		face[0].nVerts = 5;
+		face[0].vert = new VertexID[5];
+		face[0].vert[4].vertIndex = 1;
+		face[0].vert[3].vertIndex = 3;
+		face[0].vert[2].vertIndex = 5;
+		face[0].vert[1].vertIndex = 7;
+		face[0].vert[0].vertIndex = 9;
+
+		face[1].nVerts = 3;
+		face[1].vert = new VertexID[3];
+		face[1].vert[2].vertIndex = 0;
+		face[1].vert[1].vertIndex = 1;
+		face[1].vert[0].vertIndex = 9;
+
+
+		face[2].nVerts = 3;
+		face[2].vert = new VertexID[3];
+		face[2].vert[2].vertIndex = 1;
+		face[2].vert[1].vertIndex = 2;
+		face[2].vert[0].vertIndex = 3;
+
+		face[3].nVerts = 3;
+		face[3].vert = new VertexID[3];
+		face[3].vert[2].vertIndex = 3;
+		face[3].vert[1].vertIndex = 4;
+		face[3].vert[0].vertIndex = 5;
+
+		face[4].nVerts = 3;
+		face[4].vert = new VertexID[3];
+		face[4].vert[2].vertIndex = 5;
+		face[4].vert[1].vertIndex = 6;
+		face[4].vert[0].vertIndex = 7;
+
+		face[5].nVerts = 3;
+		face[5].vert = new VertexID[3];
+		face[5].vert[2].vertIndex = 7;
+		face[5].vert[1].vertIndex = 8;
+		face[5].vert[0].vertIndex = 9;
+
+		face[6].nVerts = 5;
+		face[6].vert = new VertexID[5];
+		face[6].vert[4].vertIndex = 11;
+		face[6].vert[3].vertIndex = 13;
+		face[6].vert[2].vertIndex = 15;
+		face[6].vert[1].vertIndex = 17;
+		face[6].vert[0].vertIndex = 19;
+
+		face[7].nVerts = 3;
+		face[7].vert = new VertexID[3];
+		face[7].vert[2].vertIndex = 10;
+		face[7].vert[1].vertIndex = 11;
+		face[7].vert[0].vertIndex = 19;
+
+
+		face[8].nVerts = 3;
+		face[8].vert = new VertexID[3];
+		face[8].vert[2].vertIndex = 11;
+		face[8].vert[1].vertIndex = 12;
+		face[8].vert[0].vertIndex = 13;
+
+		face[9].nVerts = 3;
+		face[9].vert = new VertexID[3];
+		face[9].vert[2].vertIndex = 13;
+		face[9].vert[1].vertIndex = 14;
+		face[9].vert[0].vertIndex = 15;
+
+		face[10].nVerts = 3;
+		face[10].vert = new VertexID[3];
+		face[10].vert[2].vertIndex = 15;
+		face[10].vert[1].vertIndex = 16;
+		face[10].vert[0].vertIndex = 17;
+
+		face[11].nVerts = 3;
+		face[11].vert = new VertexID[3];
+		face[11].vert[2].vertIndex = 17;
+		face[11].vert[1].vertIndex = 18;
+		face[11].vert[0].vertIndex = 19;
+	}
+
+	face[12].nVerts = 4;
+	face[12].vert = new VertexID[4];
+	face[12].vert[3].vertIndex = 0;
+	face[12].vert[2].vertIndex = 1;
+	face[12].vert[1].vertIndex = 11;
+	face[12].vert[0].vertIndex = 10;
+
+	face[13].nVerts = 4;
+	face[13].vert = new VertexID[4];
+	face[13].vert[3].vertIndex = 1;
+	face[13].vert[2].vertIndex = 2;
+	face[13].vert[1].vertIndex = 12;
+	face[13].vert[0].vertIndex = 11;
+
+	face[14].nVerts = 4;
+	face[14].vert = new VertexID[4];
+	face[14].vert[3].vertIndex = 2;
+	face[14].vert[2].vertIndex = 3;
+	face[14].vert[1].vertIndex = 13;
+	face[14].vert[0].vertIndex = 12;
+
+	face[15].nVerts = 4;
+	face[15].vert = new VertexID[4];
+	face[15].vert[3].vertIndex = 3;
+	face[15].vert[2].vertIndex = 4;
+	face[15].vert[1].vertIndex = 14;
+	face[15].vert[0].vertIndex = 13;
+
+	face[16].nVerts = 4;
+	face[16].vert = new VertexID[4];
+	face[16].vert[3].vertIndex = 4;
+	face[16].vert[2].vertIndex = 5;
+	face[16].vert[1].vertIndex = 15;
+	face[16].vert[0].vertIndex = 14;
+
+	face[17].nVerts = 4;
+	face[17].vert = new VertexID[4];
+	face[17].vert[3].vertIndex = 5;
+	face[17].vert[2].vertIndex = 6;
+	face[17].vert[1].vertIndex = 16;
+	face[17].vert[0].vertIndex = 15;
+
+
+	face[18].nVerts = 4;
+	face[18].vert = new VertexID[4];
+	face[18].vert[3].vertIndex = 6;
+	face[18].vert[2].vertIndex = 7;
+	face[18].vert[1].vertIndex = 17;
+	face[18].vert[0].vertIndex = 16;
+
+	face[19].nVerts = 4;
+	face[19].vert = new VertexID[4];
+	face[19].vert[3].vertIndex = 7;
+	face[19].vert[2].vertIndex = 8;
+	face[19].vert[1].vertIndex = 18;
+	face[19].vert[0].vertIndex = 17;
+
+	face[20].nVerts = 4;
+	face[20].vert = new VertexID[4];
+	face[20].vert[3].vertIndex = 8;
+	face[20].vert[2].vertIndex = 9;
+	face[20].vert[1].vertIndex = 19;
+	face[20].vert[0].vertIndex = 18;
+
+	face[21].nVerts = 4;
+	face[21].vert = new VertexID[4];
+	face[21].vert[0].vertIndex = 9;
+	face[21].vert[1].vertIndex = 0;
+	face[21].vert[2].vertIndex = 10;
+	face[21].vert[3].vertIndex = 19;
+
+	CalculateFacesNorm();
 }
 
 void Mesh::DrawCameraLens() {
