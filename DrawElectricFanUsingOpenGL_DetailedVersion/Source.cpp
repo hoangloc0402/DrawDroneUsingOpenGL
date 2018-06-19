@@ -576,9 +576,9 @@ void setUpAngle() {
 		fallAngle = 0;
 	else if (fallAngle > maxFallAngle) 
 		fallAngle = maxFallAngle;
-	if (fanSpeed < 0) 
-		fanSpeed = 0;
-	else if (fanSpeed > maxFanSpeed) 
+	if (fanSpeed < 1) 
+		fanSpeed = 1;
+	else if (fanSpeed >= maxFanSpeed) 
 		fanSpeed = maxFanSpeed;
 }
 
@@ -699,7 +699,7 @@ void myDisplay() {
 		glRotatef(90, 0, 1, 0);
 		drawHeliMachine();
 		if (fanSpeed < maxFanSpeed)
-			glRotatef(angle*10, 0, 1, 0);
+			glRotatef(angle*5, 0, 1, 0);
 		drawFan(fallAngle);
 	}
 	glPopMatrix();
