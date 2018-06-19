@@ -16,7 +16,8 @@ void Mesh::Draw() {
 		glEnd();
 	}
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------------
+//Loc
 void Mesh::CalculateFacesNorm() {
 	float mx, my, mz;
 	int numVertOnFace;
@@ -38,50 +39,6 @@ void Mesh::CalculateFacesNorm() {
 		face[faceCount].facenorm.set(mx, my, mz);
 	}
 
-}
-
-void Mesh::CreateHeliFace(int numVertexEachEdge) {
-
-	numVerts = numVertexEachEdge * numVertexEachEdge;
-	pt = new Point3[numVerts];
-
-	int count = 0;
-	float delta = 2.0f / (numVertexEachEdge -1);
-	/*for (float x = -1.0f; x <= 1.0f; x += delta) {
-		for (float y = -1.0f; y <= 1.0f; y +=delta) {
-			float z = (x + 0.5f) * (x + 0.5f) + y * y;
-			pt[count].set(x, y, z);
-			count++;
-		}
-	}*/
-	for (int i = 0; i < numVertexEachEdge; i++) {
-		float x = -1.0f + i * delta;
-		for (float j = 0; j < numVertexEachEdge; j++) {
-			float y = -1.0f + j * delta;
-			float z = (x + 0.5f) * (x + 0.5f) + y * y;
-			pt[count].set(x, y, z);
-			count++;
-		}
-	}
-
-	numFaces = pow(numVertexEachEdge - 1, 2);
-	face = new Face[numFaces];
-
-
-	count = 0;
-	for (int i = 0; i < (numVertexEachEdge - 1); i++) {
-		for (int j = 0; j < (numVertexEachEdge - 1); j++) {
-			face[count].nVerts = 4;
-			face[count].vert = new VertexID[4];
-
-			face[count].vert[0].vertIndex = i * numVertexEachEdge + j;
-			face[count].vert[1].vertIndex = i * numVertexEachEdge + j + 1;
-			face[count].vert[2].vertIndex = (i + 1) * numVertexEachEdge + j + 1;
-			face[count].vert[3].vertIndex = (i + 1) * numVertexEachEdge + j;
-
-			count++;
-		}
-	}
 }
 
 void Mesh::CreateEclipseCylinder(int length, int solidity, float rX, float rY) {
@@ -474,187 +431,1559 @@ void Mesh::CreateStar() {
 	CalculateFacesNorm();
 }
 
-void Mesh::DrawCameraLens() {
-	float lenHeight = 0.5f;
-	float lenRadius = 1.0f;
-	float alpha = 0.9f;
-	float beta = 0.87f;
-	float garma = 0.8f;
-	float theta = 0.85f;
-	float s1 = 0.4f;
-	float s2 = 0.9f;
-	float s3 = 1.0f;
-	float s4 = 1.7f;
-	float alphaLenRadius = lenRadius * alpha;
-	float betaLenRadius = lenRadius * beta;
-	float garmaLenRadius = lenRadius * garma;
-	float thetaLenRadius = lenRadius * theta;
-	int secCount = 360;
+//---------------------------------------------------------------------------------------------------------------------------------------
+//Hao
+void Mesh::CreateCylinder(float height, int solidity, float radius) {
+	Mesh::CreateHoleCylinder(height, solidity, 0.0, radius, radius);
+}
 
-	numVerts = secCount * 10;
+void Mesh::CreateExpShapeCylinder(float gamma, int solidity, float width, float cyRadius, int numCycle) {
+	numVerts = solidity * numCycle;
+	numFaces = solidity * (numCycle - 1);
+	pt = new Point3[numVerts];
+	float deltaL = 15.0f / (numCycle - 1.0f);
+	float radStep = 360.0f*DEG2RAD / solidity;
+	for (int i = 0; i < solidity; i++) {
+		for (int j = 0; j < numCycle; j++) {
+			float temp;
+			pt[i + solidity * j].y = temp = cyRadius * cos(i*radStep) + deltaL * j;
+			pt[i + solidity * j].x = log((temp - cyRadius * cos(i*radStep) - 1) / ((2 + cyRadius * cos(i*radStep))*0.1f));
+			pt[i + solidity * j].z = cyRadius * sin(i*radStep);
+		}
+	}
+
+	face = new Face[numFaces];
+	for (int i = 0; i < solidity; i++) {
+		for (int j = 0; j < numCycle - 1; j++) {
+			int faceNum = i + solidity * j;
+			face[faceNum].nVerts = 4;
+			face[faceNum].vert = new VertexID[4];
+			face[faceNum].vert[3].vertIndex = i + solidity * j;
+			face[faceNum].vert[2].vertIndex = (i + 1) % solidity + solidity * j;
+			face[faceNum].vert[1].vertIndex = (i + 1) % solidity + solidity * (j + 1);
+			face[faceNum].vert[0].vertIndex = i + solidity * (j + 1);
+		}
+	}
+
+	CalculateFacesNorm();
+}
+
+void Mesh::CreateCuboid(float height1, float height2, float width1, float width2, float thickness) {
+	numVerts = 8;
+	numFaces = 6;
 	pt = new Point3[numVerts];
 
-	for (int i = 0; i < secCount; i++) {
-		pt[i].x = lenRadius * cos(i * 360.0 / secCount * DEG2RAD);
-		pt[i].z = lenRadius * sin(i * 360.0 / secCount * DEG2RAD);
-		pt[i].y = 0;
+	pt[0].x = width1 / 2;
+	pt[0].y = thickness / 2;
+	pt[0].z = height1 / 2;
+	pt[1].x = width1 / 2;
+	pt[1].y = thickness / 2;
+	pt[1].z = -height1 / 2;
+	pt[2].x = -width1 / 2;
+	pt[2].y = thickness / 2;
+	pt[2].z = -height1 / 2;
+	pt[3].x = -width1 / 2;
+	pt[3].y = thickness / 2;
+	pt[3].z = height1 / 2;
+	pt[4].x = width2 / 2;
+	pt[4].y = -thickness / 2;
+	pt[4].z = height2 / 2;
+	pt[5].x = width2 / 2;
+	pt[5].y = -thickness / 2;
+	pt[5].z = -height2 / 2;
+	pt[6].x = -width2 / 2;
+	pt[6].y = -thickness / 2;
+	pt[6].z = -height2 / 2;
+	pt[7].x = -width2 / 2;
+	pt[7].y = -thickness / 2;
+	pt[7].z = height2 / 2;
 
-		pt[i + secCount].x = alphaLenRadius * cos(i * 360.0 / secCount * DEG2RAD);
-		pt[i + secCount].z = alphaLenRadius * sin(i * 360.0 / secCount * DEG2RAD);
-		pt[i + secCount].y = lenHeight;
-	}
-
-	for (int i = secCount * 2; i < secCount * 3; i++) {
-		pt[i].x = betaLenRadius * cos(i * 360.0 / secCount * DEG2RAD);
-		pt[i].z = betaLenRadius * sin(i * 360.0 / secCount * DEG2RAD);
-		pt[i].y = lenHeight;
-	}
-
-	for (int i = secCount * 3; i < secCount * 4; i++) {
-		pt[i].x = garmaLenRadius * cos(i * 360.0 / secCount * DEG2RAD);
-		pt[i].z = garmaLenRadius * sin(i * 360.0 / secCount * DEG2RAD);
-		pt[i].y = - lenHeight * s1;
-	}
-
-	for (int i = secCount * 4; i < secCount * 5; i++) {
-		pt[i].x = thetaLenRadius * cos(i * 360.0 / secCount * DEG2RAD);
-		pt[i].z = thetaLenRadius * sin(i * 360.0 / secCount * DEG2RAD);
-		pt[i].y = -lenHeight * s1;
-	}
-
-	for (int i = secCount * 5; i < secCount * 6; i++) {
-		pt[i].x = thetaLenRadius * cos(i * 360.0 / secCount * DEG2RAD);
-		pt[i].z = thetaLenRadius * sin(i * 360.0 / secCount * DEG2RAD);
-		pt[i].y = -lenHeight * s2;
-	}
-
-	for (int i = secCount * 6; i < secCount * 7; i++) {
-		pt[i].x = garmaLenRadius * cos(i * 360.0 / secCount * DEG2RAD);
-		pt[i].z = garmaLenRadius * sin(i * 360.0 / secCount * DEG2RAD);
-		pt[i].y = -lenHeight * s2;
-	}
-
-	for (int i = secCount * 7; i < secCount * 8; i++) {
-		pt[i].x = garmaLenRadius * cos(i * 360.0 / secCount * DEG2RAD);
-		pt[i].z = garmaLenRadius * sin(i * 360.0 / secCount * DEG2RAD);
-		pt[i].y = -lenHeight * s3;
-	}
-
-	for (int i = secCount * 8; i < secCount * 9; i++) {
-		pt[i].x = thetaLenRadius * cos(i * 360.0 / secCount * DEG2RAD);
-		pt[i].z = thetaLenRadius * sin(i * 360.0 / secCount * DEG2RAD);
-		pt[i].y = -lenHeight * s3;
-	}
-
-	for (int i = secCount * 9; i < secCount * 10; i++) {
-		pt[i].x = thetaLenRadius * cos(i * 360.0 / secCount * DEG2RAD);
-		pt[i].z = thetaLenRadius * sin(i * 360.0 / secCount * DEG2RAD);
-		pt[i].y = -lenHeight * s4;
-	}
-
-	numFaces = secCount * 9;
 	face = new Face[numFaces];
 
-	// Draw Outter Lens
-	for (int i = 0; i < secCount; i++) {
-		face[i].nVerts = 4;
-		face[i].vert = new VertexID[face[i].nVerts];
+	face[0].nVerts = 4;
+	face[0].vert = new VertexID[4];
+	face[0].vert[3].vertIndex = 0;
+	face[0].vert[2].vertIndex = 1;
+	face[0].vert[1].vertIndex = 2;
+	face[0].vert[0].vertIndex = 3;
 
-		face[i].vert[0].vertIndex = i;
-		face[i].vert[1].vertIndex = i + secCount;
-		face[i].vert[2].vertIndex = (i + 1) % secCount + secCount;
-		face[i].vert[3].vertIndex = (i + 1) % secCount;
+	face[1].nVerts = 4;
+	face[1].vert = new VertexID[4];
+	face[1].vert[3].vertIndex = 7;
+	face[1].vert[2].vertIndex = 6;
+	face[1].vert[1].vertIndex = 5;
+	face[1].vert[0].vertIndex = 4;
 
+	face[2].nVerts = 4;
+	face[2].vert = new VertexID[4];
+	face[2].vert[3].vertIndex = 0;
+	face[2].vert[2].vertIndex = 4;
+	face[2].vert[1].vertIndex = 5;
+	face[2].vert[0].vertIndex = 1;
+
+	face[3].nVerts = 4;
+	face[3].vert = new VertexID[4];
+	face[3].vert[0].vertIndex = 1;
+	face[3].vert[1].vertIndex = 5;
+	face[3].vert[2].vertIndex = 6;
+	face[3].vert[3].vertIndex = 2;
+
+	face[4].nVerts = 4;
+	face[4].vert = new VertexID[4];
+	face[4].vert[3].vertIndex = 2;
+	face[4].vert[2].vertIndex = 6;
+	face[4].vert[1].vertIndex = 7;
+	face[4].vert[0].vertIndex = 3;
+
+	face[5].nVerts = 4;
+	face[5].vert = new VertexID[4];
+	face[5].vert[0].vertIndex = 0;
+	face[5].vert[1].vertIndex = 3;
+	face[5].vert[2].vertIndex = 7;
+	face[5].vert[3].vertIndex = 4;
+
+	CalculateFacesNorm();
+}
+
+void Mesh::CreateSkidHead(float height, float cyRadius, int solidity, int numCycle) {
+	numVerts = solidity * numCycle;
+	numFaces = solidity * (numCycle - 1);
+	pt = new Point3[numVerts];
+	float deltaL = 5.0f / (numCycle - 1.0f);
+	float radStep = 360.0f*DEG2RAD / solidity;
+	float deltaR = cyRadius / (numCycle - 1.0f);
+	for (int i = 0; i < solidity; i++) {
+		for (int j = 0; j < numCycle; j++) {
+			float temp;
+			pt[i + solidity * j].y = temp = deltaR * j*cos(i*radStep) + deltaL * j;
+			pt[i + solidity * j].x = sqrt(temp / (deltaR*j*cos(i*radStep) + 1));
+			pt[i + solidity * j].z = deltaR * j * sin(i*radStep);
+		}
 	}
 
-	// Draw In Lens
-	for (int i = 0; i < secCount; i++) {
-		face[i + secCount].nVerts = 4;
-		face[i + secCount].vert = new VertexID[face[i].nVerts];
-
-		face[i + secCount].vert[0].vertIndex = i + secCount;
-		face[i + secCount].vert[1].vertIndex = i + secCount * 2;
-		face[i + secCount].vert[2].vertIndex = (i + 1) % secCount + secCount * 2;
-		face[i + secCount].vert[3].vertIndex = (i + 1) % secCount + secCount;
-
-	}
-	// Draw InnerLens
-	for (int i = 0; i < secCount; i++) {
-		face[i + secCount * 2].nVerts = 4;
-		face[i + secCount * 2].vert = new VertexID[face[i].nVerts];
-
-		face[i + secCount * 2].vert[0].vertIndex = i + secCount * 2;
-		face[i + secCount * 2].vert[1].vertIndex = i + secCount * 3;
-		face[i + secCount * 2].vert[2].vertIndex = (i + 1) % secCount + secCount * 3;
-		face[i + secCount * 2].vert[3].vertIndex = (i + 1) % secCount + secCount * 2;
-
+	face = new Face[numFaces];
+	for (int i = 0; i < solidity; i++) {
+		for (int j = 0; j < numCycle - 1; j++) {
+			int faceNum = i + solidity * j;
+			face[faceNum].nVerts = 4;
+			face[faceNum].vert = new VertexID[4];
+			face[faceNum].vert[3].vertIndex = i + solidity * j;
+			face[faceNum].vert[2].vertIndex = (i + 1) % solidity + solidity * j;
+			face[faceNum].vert[1].vertIndex = (i + 1) % solidity + solidity * (j + 1);
+			face[faceNum].vert[0].vertIndex = i + solidity * (j + 1);
+		}
 	}
 
-	// Draw bottom Lens
-	for (int i = 0; i < secCount; i++) {
-		face[i + secCount * 3].nVerts = 4;
-		face[i + secCount * 3].vert = new VertexID[face[i].nVerts];
+	CalculateFacesNorm();
+}
 
-		face[i + secCount * 3].vert[0].vertIndex = i;
-		face[i + secCount * 3].vert[1].vertIndex = i + secCount * 4;
-		face[i + secCount * 3].vert[2].vertIndex = (i + 1) % secCount + secCount * 4;
-		face[i + secCount * 3].vert[3].vertIndex = (i + 1) % secCount;
-
+void Mesh::CreateHeliMachine(float height, float radius, int solidity, int numSlice) {
+	numVerts = solidity * numSlice;
+	numFaces = solidity * (numSlice - 1);
+	float radStep = 30.0f*DEG2RAD / (solidity - 2);
+	float deltaH = height / (numSlice - 1);
+	pt = new Point3[numVerts];
+	for (int i = 0; i < solidity; i++) {
+		for (int j = 0; j < numSlice; j++) {
+			radStep = (30.0f - j * 0.1)*DEG2RAD / (solidity - 2);
+			if (i == solidity - 1) {
+				pt[i + solidity * j].y = deltaH * j;
+				pt[i + solidity * j].x = pow(pt[i + solidity * j].y, 2);
+				pt[i + solidity * j].z = 0;
+			}
+			else {
+				pt[i + solidity * j].x = (radius - 0.0003*j*j)*cos((radStep*i - (30.0f - j * 0.1) * DEG2RAD / 2));
+				pt[i + solidity * j].y = deltaH * j;
+				pt[i + solidity * j].z = (radius - 0.0003*j*j)*sin((radStep*i - (30.0f - j * 0.1) * DEG2RAD / 2));
+			}
+		}
 	}
 
-	// Draw bottom Lens
-	for (int i = 0; i < secCount; i++) {
-		face[i + secCount * 4].nVerts = 4;
-		face[i + secCount * 4].vert = new VertexID[face[i].nVerts];
+	face = new Face[numFaces];
 
-		face[i + secCount * 4].vert[0].vertIndex = i + secCount * 4;
-		face[i + secCount * 4].vert[1].vertIndex = i + secCount * 5;
-		face[i + secCount * 4].vert[2].vertIndex = (i + 1) % secCount + secCount * 5;
-		face[i + secCount * 4].vert[3].vertIndex = (i + 1) % secCount + secCount * 4;
-
+	for (int i = 0; i < solidity; i++) {
+		for (int j = 0; j < numSlice - 1; j++) {
+			int faceNum = i + solidity * j;
+			face[faceNum].nVerts = 4;
+			face[faceNum].vert = new VertexID[4];
+			face[faceNum].vert[0].vertIndex = i + solidity * j;
+			face[faceNum].vert[1].vertIndex = (i + 1) % solidity + solidity * j;
+			face[faceNum].vert[2].vertIndex = (i + 1) % solidity + solidity * (j + 1);
+			face[faceNum].vert[3].vertIndex = i + solidity * (j + 1);
+		}
 	}
 
-	for (int i = 0; i < secCount; i++) {
-		face[i + secCount * 5].nVerts = 4;
-		face[i + secCount * 5].vert = new VertexID[face[i].nVerts];
+	face[numFaces - 1].nVerts = solidity;
+	face[numFaces - 1].vert = new VertexID[solidity];
+	face[numFaces - 2].nVerts = solidity;
+	face[numFaces - 2].vert = new VertexID[solidity];
+	for (int i = 0; i < solidity; i++) {
+		face[numFaces - 1].vert[solidity - 1 - i].vertIndex = i;
+		face[numFaces - 2].vert[i].vertIndex = i + solidity * (numSlice - 1);
+	}
+	CalculateFacesNorm();
+}
 
-		face[i + secCount * 5].vert[0].vertIndex = i + secCount * 5;
-		face[i + secCount * 5].vert[1].vertIndex = i + secCount * 6;
-		face[i + secCount * 5].vert[2].vertIndex = (i + 1) % secCount + secCount * 6;
-		face[i + secCount * 5].vert[3].vertIndex = (i + 1) % secCount + secCount * 5;
-
+void Mesh::CreateMushroomShape(float height, float bigRadius, float smallRadius, int solidity, int numSlice) {
+	numVerts = solidity * numSlice;
+	numFaces = solidity * (numSlice - 1) + 2;
+	float radStep = 360.0f*DEG2RAD / solidity;
+	float deltaH = height / (numSlice - 1);
+	float deltaR = (bigRadius - smallRadius) / (numSlice - 1);
+	pt = new Point3[numVerts];
+	for (int i = 0; i < solidity; i++) {
+		for (int j = 0; j < numSlice; j++) {
+			pt[i + solidity * j].x = (bigRadius - 0.2*pow(deltaR*j, 2))*cos((radStep*i - (30.0f - j * 0.1) * DEG2RAD / 2));
+			pt[i + solidity * j].y = deltaH * j;
+			pt[i + solidity * j].z = (bigRadius - 0.2*pow(deltaR*j, 2))*sin((radStep*i - (30.0f - j * 0.1) * DEG2RAD / 2));
+		}
 	}
 
-	for (int i = 0; i < secCount; i++) {
-		face[i + secCount * 6].nVerts = 4;
-		face[i + secCount * 6].vert = new VertexID[face[i].nVerts];
+	face = new Face[numFaces];
 
-		face[i + secCount * 6].vert[0].vertIndex = i + secCount * 6;
-		face[i + secCount * 6].vert[1].vertIndex = i + secCount * 7;
-		face[i + secCount * 6].vert[2].vertIndex = (i + 1) % secCount + secCount * 7;
-		face[i + secCount * 6].vert[3].vertIndex = (i + 1) % secCount + secCount * 6;
-
+	for (int i = 0; i < solidity; i++) {
+		for (int j = 0; j < numSlice - 1; j++) {
+			int faceNum = i + solidity * j;
+			face[faceNum].nVerts = 4;
+			face[faceNum].vert = new VertexID[4];
+			face[faceNum].vert[0].vertIndex = i + solidity * j;
+			face[faceNum].vert[1].vertIndex = (i + 1) % solidity + solidity * j;
+			face[faceNum].vert[2].vertIndex = (i + 1) % solidity + solidity * (j + 1);
+			face[faceNum].vert[3].vertIndex = i + solidity * (j + 1);
+		}
 	}
 
-	for (int i = 0; i < secCount; i++) {
-		face[i + secCount * 7].nVerts = 4;
-		face[i + secCount * 7].vert = new VertexID[face[i].nVerts];
+	face[numFaces - 1].nVerts = solidity;
+	face[numFaces - 1].vert = new VertexID[solidity];
+	face[numFaces - 2].nVerts = solidity;
+	face[numFaces - 2].vert = new VertexID[solidity];
+	for (int i = 0; i < solidity; i++) {
+		face[numFaces - 1].vert[solidity - 1 - i].vertIndex = i;
+		face[numFaces - 2].vert[i].vertIndex = i + solidity * (numSlice - 1);
+	}
+	CalculateFacesNorm();
+}
 
-		face[i + secCount * 7].vert[0].vertIndex = i + secCount * 7;
-		face[i + secCount * 7].vert[1].vertIndex = i + secCount * 8;
-		face[i + secCount * 7].vert[2].vertIndex = (i + 1) % secCount + secCount * 8;
-		face[i + secCount * 7].vert[3].vertIndex = (i + 1) % secCount + secCount * 7;
+//---------------------------------------------------------------------------------------------------------------------------------------
+//Tien
+void Mesh::CreateHeliFace(int numVertexEachEdge) {
+	numVerts = numVertexEachEdge * numVertexEachEdge + numVertexEachEdge * 4;
+	pt = new Point3[numVerts];
 
+	//rightPt = new Point3[numVertexEachEdge];
+	float offset = 0.15f;
+
+	//float maxZ = 3.4025f;
+
+	int count = 0;
+	float deltaY = 2.0f / (numVertexEachEdge - 1);
+	float deltaX = 2.5f / (numVertexEachEdge - 1);
+
+	for (int i = 0; i < numVertexEachEdge; i++) {
+		float x = -1.0f + i * deltaX;
+		for (float j = 0; j < numVertexEachEdge; j++) {
+			float y = -1.0f + j * deltaY;
+			float z = (x + 0.05f) * (x + 0.05f) + y * y;
+			//if (i == numVertexEachEdge - 1) z = 5.0;
+			pt[count].set(x, y, z);
+			count++;
+		}
 	}
 
-	for (int i = 0; i < secCount; i++) {
-		face[i + secCount * 8].nVerts = 4;
-		face[i + secCount * 8].vert = new VertexID[face[i].nVerts];
+	numFaces = pow(numVertexEachEdge - 1, 2) + (numVertexEachEdge - 1) * 0;
+	face = new Face[numFaces];
 
-		face[i + secCount * 8].vert[0].vertIndex = i + secCount * 8;
-		face[i + secCount * 8].vert[1].vertIndex = i + secCount * 9;
-		face[i + secCount * 8].vert[2].vertIndex = (i + 1) % secCount + secCount * 9;
-		face[i + secCount * 8].vert[3].vertIndex = (i + 1) % secCount + secCount * 8;
+	int vertexCount = count;
+	count = 0;
 
+	for (int i = 0; i < (numVertexEachEdge - 1); i++) {
+		for (int j = 0; j < (numVertexEachEdge - 1); j++) {
+			face[count].nVerts = 4;
+			face[count].vert = new VertexID[4];
+
+			face[count].vert[0].vertIndex = i * numVertexEachEdge + j;
+			face[count].vert[1].vertIndex = i * numVertexEachEdge + j + 1;
+			face[count].vert[2].vertIndex = (i + 1) * numVertexEachEdge + j + 1;
+			face[count].vert[3].vertIndex = (i + 1) * numVertexEachEdge + j;
+
+			count++;
+		}
+	}
+
+}
+
+void Mesh::CreateHeliFaceRightSide(int numVertexEachEdge, float alpha) {
+	numVerts = numVertexEachEdge * numVertexEachEdge;
+	pt = new Point3[numVerts];
+
+	float offset = 0.15f;
+
+	int count = 0;
+	float deltaY = 2.0f / (numVertexEachEdge - 1);
+	float deltaX = 2.5f / (numVertexEachEdge - 1);
+
+	for (int i = 0; i < numVertexEachEdge; i++) {
+		float x = -1.0f + i * deltaX;
+		float y = -1.0f;
+		float z = (x + 0.05f) * (x + 0.05f) + y * y;
+		pt[count].set(x, y, z);
+		count++;
+		//cout << count << " " << pt[count].x << " " << pt[count].y << " " << pt[count].z << endl;
+	}
+
+	float maxZ = 11.0f;
+	float maxY = -1.25f;
+	float sucker = 1.0f;
+
+	for (int i = 1; i < numVertexEachEdge; i++) {
+		for (int j = 0; j < numVertexEachEdge; j++) {
+			float alphaZ = (maxZ - pt[j].z) / (numVertexEachEdge - 1);
+			float z = pt[(i - 1)*numVertexEachEdge + j].z + alphaZ;
+			float x = pt[(i - 1)*numVertexEachEdge + j].x;
+			float alphaY = (maxY - pt[j].y) / (numVertexEachEdge - 1);
+			float y = pt[(i - 1)*numVertexEachEdge + j].y + (sucker*alpha + 1)*alphaY;
+			pt[i*numVertexEachEdge + j].set(x, y, z);
+		}
+		sucker -= deltaY;
+	}
+
+	numFaces = pow(numVertexEachEdge - 1, 2);
+	face = new Face[numFaces];
+
+	count = 0;
+
+	for (int i = 0; i < (numVertexEachEdge - 1); i++) {
+		for (int j = 0; j < (numVertexEachEdge - 1); j++) {
+			face[count].nVerts = 4;
+			face[count].vert = new VertexID[4];
+
+			face[count].vert[0].vertIndex = i * numVertexEachEdge + j;
+			face[count].vert[1].vertIndex = i * numVertexEachEdge + j + 1;
+			face[count].vert[2].vertIndex = (i + 1) * numVertexEachEdge + j + 1;
+			face[count].vert[3].vertIndex = (i + 1) * numVertexEachEdge + j;
+
+			count++;
+		}
+	}
+}
+
+void Mesh::CreateHeliFaceLeftSide(int numVertexEachEdge, float alpha)
+{
+	numVerts = numVertexEachEdge * numVertexEachEdge;
+	pt = new Point3[numVerts];
+
+	float offset = 0.15f;
+
+	int count = 0;
+	float deltaY = 2.0f / (numVertexEachEdge - 1);
+	float deltaX = 2.5f / (numVertexEachEdge - 1);
+
+	for (int i = 0; i < numVertexEachEdge; i++) {
+		float x = -1.0f + i * deltaX;
+		float y = 1.0f;
+		float z = (x + 0.05f) * (x + 0.05f) + y * y;
+		pt[count].set(x, y, z);
+		count++;
+		//cout << count << " " << pt[count].x << " " << pt[count].y << " " << pt[count].z << endl;
+	}
+
+	float maxZ = 11.0f;
+	float maxY = 1.25f;
+
+	float sucker = 1.0f;
+
+	for (int i = 1; i < numVertexEachEdge; i++) {
+		for (int j = 0; j < numVertexEachEdge; j++) {
+			float alphaZ = (maxZ - pt[j].z) / (numVertexEachEdge - 1);
+			float z = pt[(i - 1)*numVertexEachEdge + j].z + alphaZ;
+			float x = pt[(i - 1)*numVertexEachEdge + j].x;
+			float alphaY = (maxY - pt[j].y) / (numVertexEachEdge - 1);
+			float y = pt[(i - 1)*numVertexEachEdge + j].y + (sucker*alpha + 1)*alphaY;
+			pt[i*numVertexEachEdge + j].set(x, y, z);
+		}
+		sucker -= deltaY;
+	}
+
+	numFaces = pow(numVertexEachEdge - 1, 2);
+	face = new Face[numFaces];
+
+	count = 0;
+	for (int i = 0; i < (numVertexEachEdge - 1); i++) {
+		for (int j = 0; j < (numVertexEachEdge - 1); j++) {
+			face[count].nVerts = 4;
+			face[count].vert = new VertexID[4];
+
+			face[count].vert[0].vertIndex = i * numVertexEachEdge + j;
+			face[count].vert[1].vertIndex = (i + 1) * numVertexEachEdge + j;
+			face[count].vert[2].vertIndex = (i + 1) * numVertexEachEdge + j + 1;
+			face[count].vert[3].vertIndex = i * numVertexEachEdge + j + 1;
+
+			count++;
+		}
+	}
+}
+
+void Mesh::CreateHeliFaceTopSide(int numVertexEachEdge, float alpha)
+{
+	numVerts = numVertexEachEdge * numVertexEachEdge;
+	pt = new Point3[numVerts];
+
+	float offset = 0.15f;
+
+	int count = 0;
+	float deltaY = 2.0f / (numVertexEachEdge - 1);
+	float deltaX = 2.5f / (numVertexEachEdge - 1);
+
+	for (int i = 0; i < numVertexEachEdge; i++) {
+		float x = 1.5f;
+		float y = -1.0f + i * deltaY;
+		float z = (x + 0.05f) * (x + 0.05f) + y * y;
+		pt[count].set(x, y, z);
+		count++;
+	}
+
+	float maxZ = 11.0f;
+	float maxX = 1.75f;
+
+	float sucker = 1.0f;
+
+	for (int i = 1; i < numVertexEachEdge; i++) {
+		for (int j = 0; j < numVertexEachEdge; j++) {
+			float alphaZ = (maxZ - pt[j].z) / (numVertexEachEdge - 1);
+			float z = pt[(i - 1)*numVertexEachEdge + j].z + alphaZ;
+			float y = pt[(i - 1)*numVertexEachEdge + j].y;
+			float alphaX = (maxX - pt[j].x) / (numVertexEachEdge - 1);
+			float x = pt[(i - 1)*numVertexEachEdge + j].x + (sucker*alpha + 1)*alphaX;
+			pt[i*numVertexEachEdge + j].set(x, y, z);
+		}
+		sucker -= deltaY;
+	}
+
+	numFaces = pow(numVertexEachEdge - 1, 2);
+	face = new Face[numFaces];
+
+	count = 0;
+	//int i = 0, j = 0;
+	for (int i = 0; i < (numVertexEachEdge - 1); i++) {
+		for (int j = 0; j < (numVertexEachEdge - 1); j++) {
+			face[count].nVerts = 4;
+			face[count].vert = new VertexID[4];
+
+			face[count].vert[0].vertIndex = i * numVertexEachEdge + j;
+			face[count].vert[1].vertIndex = i * numVertexEachEdge + j + 1;
+			face[count].vert[2].vertIndex = (i + 1) * numVertexEachEdge + j + 1;
+			face[count].vert[3].vertIndex = (i + 1) * numVertexEachEdge + j;
+
+			count++;
+		}
+	}
+}
+
+void Mesh::CreateHeliFaceTopSideGapRight(int numVertexEachEdge, float alpha, float alpha2)
+{
+	numVerts = numVertexEachEdge * numVertexEachEdge;
+	pt = new Point3[numVerts];
+
+	float offset = 0.15f;
+
+	int count = 0;
+	float deltaY = 2.0f / (numVertexEachEdge - 1);
+	float deltaX = 2.5f / (numVertexEachEdge - 1);
+
+	float maxZ = 11.0f;
+	float maxX = 1.75f;
+
+	float sucker = 1.0f;
+
+	pt[0].set(1.5, -1.0, 3.4025);
+
+	for (int i = 1; i < numVertexEachEdge; i++) {
+		float alphaZ = (maxZ - pt[0].z) / (numVertexEachEdge - 1);
+		float z = pt[i - 1].z + alphaZ;
+		float y = pt[i - 1].y;
+		float alphaX = (maxX - pt[0].x) / (numVertexEachEdge - 1);
+		float x = pt[i - 1].x + (sucker*alpha + 1)*alphaX;
+		pt[i].set(x, y, z);
+		sucker -= deltaY;
+	}
+
+
+	maxZ = 11.0f;
+	float maxY = -1.25f;
+
+	sucker = 1.0f;
+	int k;
+	for (int i = 1; i < numVertexEachEdge; i++) {
+		float alphaZ = (maxZ - pt[0].z) / (numVertexEachEdge - 1);
+		if (i == 1) k = 1;
+		float z = pt[k - 1].z + alphaZ;
+		float x = pt[k - 1].x;
+		float alphaY = (maxY - pt[0].y) / (numVertexEachEdge - 1);
+		float y = pt[k - 1].y + (sucker*alpha2 + 1)*alphaY;
+		if (i == 1) k = numVertexEachEdge;
+		pt[k].set(x, y, z);
+		k++;
+		sucker -= deltaY;
+	}
+
+	int numV = 10;
+
+	deltaY = 2.0f / (numV - 1);
+
+	float smallAlpha = 0.5;
+
+
+
+	for (int i = 1; i <numVertexEachEdge; i++) {
+		float maxY = pt[i + numVertexEachEdge - 1].y;
+		float maxX = pt[i + numVertexEachEdge - 1].x;
+		sucker = 1.0;
+		float startY = pt[i].y;
+		float startX = pt[i].x;
+		for (int j = 0; j < numV; j++) {
+			float alphaY = (maxY - pt[i].y) / (numV);
+			float alphaX = (maxX - pt[i].x) / (numV);
+			if (j != 0) {
+				startY = pt[k - 1].y; startX = pt[k - 1].x;
+			}
+			float y = startY + (sucker*smallAlpha + 1)*alphaY;
+			float z = pt[i].z;
+			float x = startX + alphaX;
+			pt[k].set(x, y, z);
+			k++;
+			sucker -= deltaY;
+		}
+	}
+
+	numFaces = pow(numVertexEachEdge - 1, 2);
+	face = new Face[numFaces];
+
+	count = 0;
+	int base = numVertexEachEdge + numVertexEachEdge - 2;
+	int i = 1;
+	while (i < numVertexEachEdge - 1) {
+		int j = 1;
+		face[count].nVerts = 4;
+		face[count].vert = new VertexID[4];
+
+		face[count].vert[0].vertIndex = i;
+		face[count].vert[1].vertIndex = i + 1;
+		face[count].vert[2].vertIndex = base + numV + j;
+		face[count].vert[3].vertIndex = base + j;
+
+		count++;
+
+		while (j < numV) {
+			face[count].nVerts = 4;
+			face[count].vert = new VertexID[4];
+
+			face[count].vert[0].vertIndex = base + j;
+			face[count].vert[1].vertIndex = base + numV + j;
+			face[count].vert[2].vertIndex = base + numV + j + 1;
+			face[count].vert[3].vertIndex = base + j + 1;
+
+
+
+			count++;
+			j++;
+		}
+		base += numV;
+		i++;
+	}
+	int u = 1, v = (numVertexEachEdge - 1) * 2 + 1;
+	for (int i = 0; i < numV; i++) {
+		face[count].nVerts = 3;
+		face[count].vert = new VertexID[3];
+
+		face[count].vert[0].vertIndex = 0;
+		face[count].vert[1].vertIndex = u;
+		face[count].vert[2].vertIndex = v;
+		u = v;
+		v = v + 1;
+		count++;
+	}
+}
+
+void Mesh::CreateHeliFaceTopSideGapLeft(int numVertexEachEdge, float alpha, float alpha2)
+{
+	numVerts = numVertexEachEdge * numVertexEachEdge;
+	pt = new Point3[numVerts];
+
+	float offset = 0.15f;
+
+	int count = 0;
+	float deltaY = 2.0f / (numVertexEachEdge - 1);
+	float deltaX = 2.5f / (numVertexEachEdge - 1);
+
+	float maxZ = 11.0f;
+	float maxX = 1.75f;
+
+	float sucker = 1.0f;
+
+	pt[0].set(1.5, 1.0, 3.4025);
+
+	for (int i = 1; i < numVertexEachEdge; i++) {
+		float alphaZ = (maxZ - pt[0].z) / (numVertexEachEdge - 1);
+		float z = pt[i - 1].z + alphaZ;
+		float y = pt[i - 1].y;
+		float alphaX = (maxX - pt[0].x) / (numVertexEachEdge - 1);
+		float x = pt[i - 1].x + (sucker*alpha + 1)*alphaX;
+		pt[i].set(x, y, z);
+		sucker -= deltaY;
+	}
+
+
+	maxZ = 11.0f;
+	float maxY = 1.25f;
+
+	sucker = 1.0f;
+	int k;
+	for (int i = 1; i < numVertexEachEdge; i++) {
+		float alphaZ = (maxZ - pt[0].z) / (numVertexEachEdge - 1);
+		if (i == 1) k = 1;
+		float z = pt[k - 1].z + alphaZ;
+		float x = pt[k - 1].x;
+		float alphaY = (maxY - pt[0].y) / (numVertexEachEdge - 1);
+		float y = pt[k - 1].y + (sucker*alpha2 + 1)*alphaY;
+		if (i == 1) k = numVertexEachEdge;
+		pt[k].set(x, y, z);
+		k++;
+		sucker -= deltaY;
+	}
+
+	int numV = 10;
+
+	deltaY = 2.0f / (numV - 1);
+
+	float smallAlpha = 0.5;
+
+
+
+	for (int i = 1; i <numVertexEachEdge; i++) {
+		float maxY = pt[i + numVertexEachEdge - 1].y;
+		float maxX = pt[i + numVertexEachEdge - 1].x;
+		sucker = 1.0;
+		float startY = pt[i].y;
+		float startX = pt[i].x;
+		for (int j = 0; j < numV; j++) {
+			float alphaY = (maxY - pt[i].y) / (numV);
+			float alphaX = (maxX - pt[i].x) / (numV);
+			if (j != 0) {
+				startY = pt[k - 1].y; startX = pt[k - 1].x;
+			}
+			float y = startY + (sucker*smallAlpha + 1)*alphaY;
+			float z = pt[i].z;
+			float x = startX + alphaX;
+			pt[k].set(x, y, z);
+			k++;
+			sucker -= deltaY;
+		}
+	}
+
+	numFaces = pow(numVertexEachEdge - 1, 2);
+	face = new Face[numFaces];
+
+	count = 0;
+	int base = numVertexEachEdge + numVertexEachEdge - 2;
+	int i = 1;
+	while (i < numVertexEachEdge - 1) {
+		int j = 1;
+		face[count].nVerts = 4;
+		face[count].vert = new VertexID[4];
+
+		face[count].vert[0].vertIndex = i;
+		face[count].vert[1].vertIndex = i + 1;
+		face[count].vert[2].vertIndex = base + numV + j;
+		face[count].vert[3].vertIndex = base + j;
+
+		count++;
+
+		while (j < numV) {
+			face[count].nVerts = 4;
+			face[count].vert = new VertexID[4];
+
+			face[count].vert[0].vertIndex = base + j;
+			face[count].vert[1].vertIndex = base + numV + j;
+			face[count].vert[2].vertIndex = base + numV + j + 1;
+			face[count].vert[3].vertIndex = base + j + 1;
+
+			count++;
+			j++;
+		}
+		base += numV;
+		i++;
+	}
+	int u = 1, v = (numVertexEachEdge - 1) * 2 + 1;
+	for (int i = 0; i < numV; i++) {
+		face[count].nVerts = 3;
+		face[count].vert = new VertexID[3];
+
+		face[count].vert[0].vertIndex = 0;
+		face[count].vert[1].vertIndex = u;
+		face[count].vert[2].vertIndex = v;
+		u = v;
+		v = v + 1;
+		count++;
+	}
+}
+
+void Mesh::CreateHeliFaceBotSide(int numVertexEachEdge, float alpha)
+{
+	numVerts = numVertexEachEdge * numVertexEachEdge;
+	pt = new Point3[numVerts];
+
+	float offset = 0.15f;
+
+	int count = 0;
+	float deltaY = 2.0f / (numVertexEachEdge - 1);
+	float deltaX = 2.5f / (numVertexEachEdge - 1);
+
+	for (int i = 0; i < numVertexEachEdge; i++) {
+		float x = -1.0f;
+		float y = -1.0f + i * deltaY;
+		float z = (x + 0.05f) * (x + 0.05f) + y * y;
+		pt[count].set(x, y, z);
+		count++;
+	}
+
+	float maxZ = 11.0f;
+	float maxX = -1.15f;
+
+	float sucker = 1.0f;
+
+	for (int i = 1; i < numVertexEachEdge; i++) {
+		for (int j = 0; j < numVertexEachEdge; j++) {
+			float alphaZ = (maxZ - pt[j].z) / (numVertexEachEdge - 1);
+			float z = pt[(i - 1)*numVertexEachEdge + j].z + alphaZ;
+			float y = pt[(i - 1)*numVertexEachEdge + j].y;
+			float alphaX = (maxX - pt[j].x) / (numVertexEachEdge - 1);
+			float x = pt[(i - 1)*numVertexEachEdge + j].x + (sucker*alpha + 1)*alphaX;
+			pt[i*numVertexEachEdge + j].set(x, y, z);
+		}
+		sucker -= deltaY;
+	}
+
+	numFaces = pow(numVertexEachEdge - 1, 2);
+	face = new Face[numFaces];
+
+	count = 0;
+	//int i = 0, j = 0;
+	for (int i = 0; i < (numVertexEachEdge - 1); i++) {
+		for (int j = 0; j < (numVertexEachEdge - 1); j++) {
+			face[count].nVerts = 4;
+			face[count].vert = new VertexID[4];
+
+			face[count].vert[0].vertIndex = i * numVertexEachEdge + j;
+			face[count].vert[1].vertIndex = i * numVertexEachEdge + j + 1;
+			face[count].vert[2].vertIndex = (i + 1) * numVertexEachEdge + j + 1;
+			face[count].vert[3].vertIndex = (i + 1) * numVertexEachEdge + j;
+
+			count++;
+		}
+	}
+}
+
+void Mesh::CreateHeliFaceBotSideGapRight(int numVertexEachEdge, float alpha1, float alpha2)
+{
+	numVerts = numVertexEachEdge * numVertexEachEdge;
+	pt = new Point3[numVerts];
+
+	float offset = 0.15f;
+
+	int count = 0;
+	float deltaY = 2.0f / (numVertexEachEdge - 1);
+	float deltaX = 2.5f / (numVertexEachEdge - 1);
+
+	float maxZ = 11.0f;
+	float maxX = -1.15f;
+
+	float sucker = 1.0f;
+
+	pt[0].set(-1.0, -1.0, 1.9025);
+
+	for (int i = 1; i < numVertexEachEdge; i++) {
+		float alphaZ = (maxZ - pt[0].z) / (numVertexEachEdge - 1);
+		float z = pt[i - 1].z + alphaZ;
+		float y = pt[i - 1].y;
+		float alphaX = (maxX - pt[0].x) / (numVertexEachEdge - 1);
+		float x = pt[i - 1].x + (sucker*alpha1 + 1)*alphaX;
+		pt[i].set(x, y, z);
+		sucker -= deltaY;
+	}
+
+
+	maxZ = 11.0f;
+	float maxY = -1.25f;
+
+	sucker = 1.0f;
+	int k;
+	for (int i = 1; i < numVertexEachEdge; i++) {
+		float alphaZ = (maxZ - pt[0].z) / (numVertexEachEdge - 1);
+		if (i == 1) k = 1;
+		float z = pt[k - 1].z + alphaZ;
+		float x = pt[k - 1].x;
+		float alphaY = (maxY - pt[0].y) / (numVertexEachEdge - 1);
+		float y = pt[k - 1].y + (sucker*alpha2 + 1)*alphaY;
+		if (i == 1) k = numVertexEachEdge;
+		pt[k].set(x, y, z);
+		k++;
+		sucker -= deltaY;
+	}
+
+	int numV = 10;
+
+	deltaY = 2.0f / (numV - 1);
+
+	float smallAlpha = 0.5;
+
+	for (int i = 1; i <numVertexEachEdge; i++) {
+		float maxY = pt[i + numVertexEachEdge - 1].y;
+		float maxX = pt[i + numVertexEachEdge - 1].x;
+		sucker = 1.0;
+		float startY = pt[i].y;
+		float startX = pt[i].x;
+		for (int j = 0; j < numV; j++) {
+			float alphaY = (maxY - pt[i].y) / (numV);
+			float alphaX = (maxX - pt[i].x) / (numV);
+			if (j != 0) {
+				startY = pt[k - 1].y; startX = pt[k - 1].x;
+			}
+			float y = startY + (sucker*smallAlpha + 1)*alphaY;
+			float z = pt[i].z;
+			float x = startX + alphaX;
+			pt[k].set(x, y, z);
+			k++;
+			sucker -= deltaY;
+		}
+	}
+
+	numFaces = pow(numVertexEachEdge - 1, 2);
+	face = new Face[numFaces];
+
+	count = 0;
+	int base = numVertexEachEdge + numVertexEachEdge - 2;
+	int i = 1;
+	while (i < numVertexEachEdge - 1) {
+		int j = 1;
+		face[count].nVerts = 4;
+		face[count].vert = new VertexID[4];
+
+		face[count].vert[0].vertIndex = i;
+		face[count].vert[1].vertIndex = i + 1;
+		face[count].vert[2].vertIndex = base + numV + j;
+		face[count].vert[3].vertIndex = base + j;
+
+		count++;
+
+		while (j < numV) {
+			face[count].nVerts = 4;
+			face[count].vert = new VertexID[4];
+
+			face[count].vert[0].vertIndex = base + j;
+			face[count].vert[1].vertIndex = base + numV + j;
+			face[count].vert[2].vertIndex = base + numV + j + 1;
+			face[count].vert[3].vertIndex = base + j + 1;
+
+
+
+			count++;
+			j++;
+		}
+		base += numV;
+		i++;
+	}
+	int u = 1, v = (numVertexEachEdge - 1) * 2 + 1;
+	for (int i = 0; i < numV; i++) {
+		face[count].nVerts = 3;
+		face[count].vert = new VertexID[3];
+
+		face[count].vert[0].vertIndex = 0;
+		face[count].vert[1].vertIndex = u;
+		face[count].vert[2].vertIndex = v;
+		u = v;
+		v = v + 1;
+		count++;
+	}
+}
+
+void Mesh::CreateHeliFaceBotSideGapLeft(int numVertexEachEdge, float alpha1, float alpha2)
+{
+	numVerts = numVertexEachEdge * numVertexEachEdge;
+	pt = new Point3[numVerts];
+
+	float offset = 0.15f;
+
+	int count = 0;
+	float deltaY = 2.0f / (numVertexEachEdge - 1);
+	float deltaX = 2.5f / (numVertexEachEdge - 1);
+
+	float maxZ = 11.0f;
+	float maxX = -1.15f;
+
+	float sucker = 1.0f;
+
+	pt[0].set(-1.0, 1.0, 1.9025);
+
+	for (int i = 1; i < numVertexEachEdge; i++) {
+		float alphaZ = (maxZ - pt[0].z) / (numVertexEachEdge - 1);
+		float z = pt[i - 1].z + alphaZ;
+		float y = pt[i - 1].y;
+		float alphaX = (maxX - pt[0].x) / (numVertexEachEdge - 1);
+		float x = pt[i - 1].x + (sucker*alpha1 + 1)*alphaX;
+		pt[i].set(x, y, z);
+		sucker -= deltaY;
+	}
+
+
+	maxZ = 11.0f;
+	float maxY = 1.25f;
+
+	sucker = 1.0f;
+	int k;
+	for (int i = 1; i < numVertexEachEdge; i++) {
+		float alphaZ = (maxZ - pt[0].z) / (numVertexEachEdge - 1);
+		if (i == 1) k = 1;
+		float z = pt[k - 1].z + alphaZ;
+		float x = pt[k - 1].x;
+		float alphaY = (maxY - pt[0].y) / (numVertexEachEdge - 1);
+		float y = pt[k - 1].y + (sucker*alpha2 + 1)*alphaY;
+		if (i == 1) k = numVertexEachEdge;
+		pt[k].set(x, y, z);
+		k++;
+		sucker -= deltaY;
+	}
+
+	int numV = 10;
+
+	deltaY = 2.0f / (numV - 1);
+
+	float smallAlpha = 0.5;
+
+
+
+	for (int i = 1; i <numVertexEachEdge; i++) {
+		float maxY = pt[i + numVertexEachEdge - 1].y;
+		float maxX = pt[i + numVertexEachEdge - 1].x;
+		sucker = 1.0;
+		float startY = pt[i].y;
+		float startX = pt[i].x;
+		for (int j = 0; j < numV; j++) {
+			float alphaY = (maxY - pt[i].y) / (numV);
+			float alphaX = (maxX - pt[i].x) / (numV);
+			if (j != 0) {
+				startY = pt[k - 1].y; startX = pt[k - 1].x;
+			}
+			float y = startY + (sucker*smallAlpha + 1)*alphaY;
+			float z = pt[i].z;
+			float x = startX + (sucker*smallAlpha + 1)*alphaX;
+			pt[k].set(x, y, z);
+			k++;
+			sucker -= deltaY;
+		}
+	}
+
+	numFaces = pow(numVertexEachEdge - 1, 2);
+	face = new Face[numFaces];
+
+	count = 0;
+	int base = numVertexEachEdge + numVertexEachEdge - 2;
+	int i = 1;
+	while (i < numVertexEachEdge - 1) {
+		int j = 1;
+		face[count].nVerts = 4;
+		face[count].vert = new VertexID[4];
+
+		face[count].vert[0].vertIndex = i;
+		face[count].vert[1].vertIndex = i + 1;
+		face[count].vert[2].vertIndex = base + numV + j;
+		face[count].vert[3].vertIndex = base + j;
+
+		count++;
+
+		while (j < numV) {
+			face[count].nVerts = 4;
+			face[count].vert = new VertexID[4];
+
+			face[count].vert[0].vertIndex = base + j;
+			face[count].vert[1].vertIndex = base + numV + j;
+			face[count].vert[2].vertIndex = base + numV + j + 1;
+			face[count].vert[3].vertIndex = base + j + 1;
+
+			count++;
+			j++;
+		}
+		base += numV;
+		i++;
+	}
+	int u = 1, v = (numVertexEachEdge - 1) * 2 + 1;
+	for (int i = 0; i < numV; i++) {
+		face[count].nVerts = 3;
+		face[count].vert = new VertexID[3];
+
+		face[count].vert[0].vertIndex = 0;
+		face[count].vert[1].vertIndex = u;
+		face[count].vert[2].vertIndex = v;
+		u = v;
+		v = v + 1;
+		count++;
+	}
+}
+
+void Mesh::CreateHeliRearBotSide(int numVertexEachEdge, float alpha, float alphaForY)
+{
+	numVerts = numVertexEachEdge * numVertexEachEdge;
+	pt = new Point3[numVerts];
+
+	float offset = 0.15f;
+
+	int count = 0;
+	float deltaY = 2.0f / (numVertexEachEdge - 1);
+	float deltaX = 2.5f / (numVertexEachEdge - 1);
+
+	float maxZ = 11.0f;
+	float maxX = -1.15f;
+
+	for (int j = 0; j < numVertexEachEdge; j++) {
+		float z = maxZ;
+		float y = -1.0 + deltaY * j;
+		float x = maxX;
+		pt[j].set(x, y, z);
+	}
+
+	maxZ = 14.0f;
+	maxX = 0.75f;
+	float maxY = 0.0f;
+	float sucker = 1.0;
+
+	/*for (int i = 1; i < numVertexEachEdge; i++) {
+	float alphaZ = (maxZ - pt[0].z) / (numVertexEachEdge - 1);
+	for (int j = 0; j < numVertexEachEdge; j++) {
+	float z = pt[(i-1)*numVertexEachEdge + j].z + alphaZ;
+	float alphaX = (maxX - pt[j].x) / (numVertexEachEdge - 1);
+	float alphaY = (maxY - pt[j].y) / (numVertexEachEdge - 1);
+	float x = pt[(i - 1)*numVertexEachEdge + j].x + (sucker*alpha + 1)*alphaX;
+	float y = pt[(i - 1)*numVertexEachEdge + j].y + (sucker*alpha + 1)*alphaY;
+	pt[i*numVertexEachEdge + j].set(x, y, z);
+	}
+	sucker -= deltaY;
+	}*/
+
+	for (int i = 1; i < numVertexEachEdge; i++) {
+		float alphaZ = (maxZ - pt[0].z) / (numVertexEachEdge - 1);
+		for (int j = 0; j < numVertexEachEdge; j++) {
+			float z = pt[(i - 1)*numVertexEachEdge + j].z + alphaZ;
+			float alphaX = (maxX - pt[j].x) / (numVertexEachEdge - 1);
+			float x = pt[(i - 1)*numVertexEachEdge + j].x + (sucker*alpha + 1)*alphaX;
+			float alphaY = (pt[j].y*alphaForY - pt[j].y) / (numVertexEachEdge - 1);
+			float y = pt[(i - 1)*numVertexEachEdge + j].y + (sucker*alpha + 1)*alphaY;
+			pt[i*numVertexEachEdge + j].set(x, y, z);
+		}
+		sucker -= deltaY;
+	}
+
+	numFaces = pow(numVertexEachEdge - 1, 2);
+	face = new Face[numFaces];
+
+	for (int i = 0; i < (numVertexEachEdge - 1); i++) {
+		for (int j = 0; j < (numVertexEachEdge - 1); j++) {
+			face[count].nVerts = 4;
+			face[count].vert = new VertexID[4];
+
+			face[count].vert[0].vertIndex = i * numVertexEachEdge + j;
+			face[count].vert[1].vertIndex = i * numVertexEachEdge + j + 1;
+			face[count].vert[2].vertIndex = (i + 1) * numVertexEachEdge + j + 1;
+			face[count].vert[3].vertIndex = (i + 1) * numVertexEachEdge + j;
+
+			count++;
+		}
+	}
+}
+
+void Mesh::CreateHeliRearTopSide(int numVertexEachEdge, float alpha, float alphaForY)
+{
+	numVerts = numVertexEachEdge * numVertexEachEdge;
+	pt = new Point3[numVerts];
+
+	float offset = 0.15f;
+
+	int count = 0;
+	float deltaY = 2.0f / (numVertexEachEdge - 1);
+	float deltaX = 2.5f / (numVertexEachEdge - 1);
+
+	float maxZ = 11.0f;
+	float maxX = 1.75f;
+
+	for (int j = 0; j < numVertexEachEdge; j++) {
+		float z = maxZ;
+		float y = -1.0 + deltaY * j;
+		float x = maxX;
+		pt[j].set(x, y, z);
+	}
+
+	maxZ = 14.0f;
+	maxX = 1.25f;
+	float maxY = 0.0f;
+	float sucker = 1.0;
+
+	/*for (int i = 1; i < numVertexEachEdge; i++) {
+	float alphaZ = (maxZ - pt[0].z) / (numVertexEachEdge - 1);
+	for (int j = 0; j < numVertexEachEdge; j++) {
+	float z = pt[(i - 1)*numVertexEachEdge + j].z + alphaZ;
+	float alphaX = (maxX - pt[j].x) / (numVertexEachEdge - 1);
+	float alphaY = (maxY - pt[j].y) / (numVertexEachEdge - 1);
+	float x = pt[(i - 1)*numVertexEachEdge + j].x + (sucker*alpha + 1)*alphaX;
+	float y = pt[(i - 1)*numVertexEachEdge + j].y + (sucker*alpha + 1)*alphaY;
+	pt[i*numVertexEachEdge + j].set(x, y, z);
+	}
+	sucker -= deltaY;
+	}*/
+
+	for (int i = 1; i < numVertexEachEdge; i++) {
+		float alphaZ = (maxZ - pt[0].z) / (numVertexEachEdge - 1);
+		for (int j = 0; j < numVertexEachEdge; j++) {
+			float z = pt[(i - 1)*numVertexEachEdge + j].z + alphaZ;
+			float alphaX = (maxX - pt[j].x) / (numVertexEachEdge - 1);
+			float x = pt[(i - 1)*numVertexEachEdge + j].x + (sucker*alpha + 1)*alphaX;
+			float alphaY = (pt[j].y*alphaForY - pt[j].y) / (numVertexEachEdge - 1);
+			float y = pt[(i - 1)*numVertexEachEdge + j].y + (sucker*alpha + 1)*alphaY;
+			pt[i*numVertexEachEdge + j].set(x, y, z);
+		}
+		sucker -= deltaY;
+	}
+
+	numFaces = pow(numVertexEachEdge - 1, 2);
+	face = new Face[numFaces];
+
+	for (int i = 0; i < (numVertexEachEdge - 1); i++) {
+		for (int j = 0; j < (numVertexEachEdge - 1); j++) {
+			face[count].nVerts = 4;
+			face[count].vert = new VertexID[4];
+
+			face[count].vert[0].vertIndex = i * numVertexEachEdge + j;
+			face[count].vert[1].vertIndex = i * numVertexEachEdge + j + 1;
+			face[count].vert[2].vertIndex = (i + 1) * numVertexEachEdge + j + 1;
+			face[count].vert[3].vertIndex = (i + 1) * numVertexEachEdge + j;
+
+			count++;
+		}
+	}
+}
+
+void Mesh::CreateHeliRearTopSideLeft(int numVertexEachEdge, float alpha)
+{
+	numVerts = numVertexEachEdge * numVertexEachEdge;
+	pt = new Point3[numVerts];
+
+	float offset = 0.15f;
+
+	int count = 0;
+	float deltaY = 2.0f / (numVertexEachEdge - 1);
+	float deltaX = 2.5f / (numVertexEachEdge - 1);
+
+	float maxZ = 11.0f;
+	float maxX = 1.75f;
+
+	for (int j = 0; j < numVertexEachEdge; j++) {
+		float z = maxZ;
+		float y = -1.0 + deltaY * j;
+		float x = maxX;
+		pt[j].set(x, y, z);
+	}
+
+	maxZ = 18.0f;
+	maxX = 0.0f;
+	float maxY = 0.0f;
+	float sucker = 1.0;
+
+	for (int i = 1; i < numVertexEachEdge; i++) {
+		float alphaZ = (maxZ - pt[0].z) / (numVertexEachEdge - 1);
+		for (int j = 0; j < numVertexEachEdge; j++) {
+			float z = pt[(i - 1)*numVertexEachEdge + j].z + alphaZ;
+			float alphaX = (maxX - pt[j].x) / (numVertexEachEdge - 1);
+			float alphaY = (maxY - pt[j].y) / (numVertexEachEdge - 1);
+			float x = pt[(i - 1)*numVertexEachEdge + j].x + (sucker*alpha + 1)*alphaX;
+			float y = pt[(i - 1)*numVertexEachEdge + j].y + (sucker*alpha + 1)*alphaY;
+			pt[i*numVertexEachEdge + j].set(x, y, z);
+		}
+		sucker -= deltaY;
+	}
+
+	numFaces = pow(numVertexEachEdge - 1, 2);
+	face = new Face[numFaces];
+
+	for (int i = 0; i < (numVertexEachEdge - 1); i++) {
+		for (int j = 0; j < (numVertexEachEdge - 1); j++) {
+			face[count].nVerts = 4;
+			face[count].vert = new VertexID[4];
+
+			face[count].vert[0].vertIndex = i * numVertexEachEdge + j;
+			face[count].vert[1].vertIndex = i * numVertexEachEdge + j + 1;
+			face[count].vert[2].vertIndex = (i + 1) * numVertexEachEdge + j + 1;
+			face[count].vert[3].vertIndex = (i + 1) * numVertexEachEdge + j;
+
+			count++;
+		}
+	}
+}
+
+void Mesh::CreateHeliRear(int numVertexEachEdge) {
+	numVerts = numVertexEachEdge * numVertexEachEdge * 50;
+	pt = new Point3[numVerts];
+
+	float offset = 0.15f;
+
+	int count = 0;
+	float deltaY = 2.0f / (numVertexEachEdge - 1);
+	float deltaX = 2.5f / (numVertexEachEdge - 1);
+
+	float maxZ = 11.001f;
+	float maxX = -1.15f;
+
+	int k = 0;
+	// bot
+	for (int j = 0; j < numVertexEachEdge; j++) {
+		float z = maxZ;
+		float y = 1.0 - deltaY * j;
+		float x = maxX - .015;
+		pt[k].set(x, y, z);
+		k++;
+	}
+
+	//bot right
+	int numV = 10;
+
+	deltaY = 2.0f / (numV - 1);
+
+	float smallAlpha = 0.5;
+	float sucker = 1.0;
+	float preX = -1.15 - .015;
+	float preY = -1;
+	for (int j = 0; j < numV; j++) {
+		float Ax = (-1.15 + 1) / numV;
+		float Ay = (-1.25 - .03 + 1) / numV;
+		float x = preX - Ax;
+		float y = preY + (sucker*smallAlpha + 1)*Ay;
+		float z = 11;
+
+		preX = x;
+		preY = y;
+
+		pt[k].set(x, y, z);
+		k++;
+		sucker -= deltaY;
+	}
+
+	//right
+
+	maxZ = 11.0f;
+	float maxY = -1.25f;
+	sucker = 1.0f;
+
+	for (int j = 1; j < numVertexEachEdge; j++) {
+		float z = 11.0;
+		float x = -1.0 + deltaX * j;
+		//float alphaY = (maxY - pt[j].y) / (numVertexEachEdge - 1);
+		float y = -1.25 - .03;
+		pt[k].set(x, y, z);
+		k++;
+	}
+
+	//righttop
+
+	numV = 10;
+
+	deltaY = 2.0f / (numV - 1);
+
+	smallAlpha = 0.5;
+	sucker = 1.0;
+	preX = 1.5;
+	preY = -1.25 - .03;
+	for (int j = 1; j < numV; j++) {
+		float Ax = (1.75 - 1.5) / numV;
+		float Ay = (-1.0 + 1.25 + .03) / numV;
+		float x = preX + Ax;
+		float y = preY + (sucker*smallAlpha + 1)*Ay;
+		float z = 11.0;
+
+		preX = x;
+		preY = y;
+
+		pt[k].set(x, y, z);
+		k++;
+		sucker -= deltaY;
+	}
+
+	/*for (int i = 1; i <numVertexEachEdge; i++) {
+	float maxY = pt[i + numVertexEachEdge - 1].y;
+	float maxX = pt[i + numVertexEachEdge - 1].x;
+	sucker = 1.0;
+	float startY = pt[i].y;
+	float startX = pt[i].x;
+	for (int j = 0; j < numV; j++) {
+	float alphaY = (maxY - pt[i].y) / (numV);
+	float alphaX = (maxX - pt[i].x) / (numV);
+	if (j != 0) {
+	startY = pt[k - 1].y; startX = pt[k - 1].x;
+	}
+	float y = startY + (sucker*smallAlpha + 1)*alphaY;
+	float z = pt[i].z;
+	float x = startX + alphaX;
+	pt[k].set(x, y, z);
+	k++;
+	sucker -= deltaY;
+	}
+	}*/
+
+	//top
+	maxZ = 11.0f;
+	maxX = 1.75f;
+
+
+	for (int j = 0; j < numVertexEachEdge; j++) {
+		float z = maxZ;
+		float y = -1.0f + 2.0f / (numVertexEachEdge - 1) * j;
+		float x = maxX + .015;
+		pt[k].set(x, y, z);
+		k++;
+	}
+
+	//lefttop
+
+	numV = 10;
+
+	deltaY = 2.0f / (numV - 1);
+
+	smallAlpha = 0.5;
+	sucker = 1.0;
+	preX = 1.75;
+	preY = 1.0;
+	for (int j = 0; j < numV; j++) {
+		float Ax = (1.5 - 1.75) / numV;
+		float Ay = (1.25 + .03 - 1) / numV;
+		float x = preX + Ax;
+		float y = preY + (sucker*smallAlpha + 1)*Ay;
+		float z = 11.0;
+
+		preX = x;
+		preY = y;
+
+		pt[k].set(x, y, z);
+		k++;
+		sucker -= deltaY;
+	}
+
+	//left 
+	maxZ = 11.0f;
+	maxY = 1.25f;
+	sucker = 1.0f;
+
+	for (int j = 1; j < numVertexEachEdge; j++) {
+		float z = 11.0;
+		float x = -1.0 + deltaX * (numVertexEachEdge - j - 1);
+		//float alphaY = (maxY - pt[j].y) / (numVertexEachEdge - 1);
+		float y = 1.25 + .03;
+		pt[k].set(x, y, z);
+		k++;
+	}
+
+	//leftbot
+
+	numV = 10;
+
+	deltaY = 2.0f / (numV - 1);
+
+	smallAlpha = 0.5;
+	sucker = 1.0;
+	preX = -1.0;
+	preY = 1.25 + .03;
+	for (int j = 0; j < numV; j++) {
+		float Ax = (-1.15 + 1) / numV;
+		float Ay = (-1.25 - .03 + 1) / numV;
+		float x = preX + Ax;
+		float y = preY + (sucker*smallAlpha + 1)*Ay;
+		float z = 11.0;
+
+		preX = x;
+		preY = y;
+
+		pt[k].set(x, y, z);
+		k++;
+		sucker -= deltaY;
+	}
+	smallAlpha = 0.7;
+	numV = 50;
+	deltaY = 2.0f / (numV - 1);
+
+	for (int i = 0; i < k; i++) {
+		float finishx = pt[i].x*0.3 + 0.7;
+		float finishy = pt[i].y*0.3;
+		float finishz = pt[i].z*1.2;
+		sucker = 1.0;
+		float aX = (finishx - pt[i].x) / (numV - 1);
+		float aY = (finishy - pt[i].y) / (numV - 1);
+		float aZ = (finishz - pt[i].z) / (numV - 1);
+		float prex = pt[i].x;
+		float prey = pt[i].y;
+		float prez = pt[i].z;
+		for (int j = 1; j < numV; j++) {
+			float x = prex + aX /** (1 + sucker * smallAlpha)*/;
+			float y = prey + aY /** (1 + sucker * smallAlpha)*/;
+			float z = prez + aZ * (1 + sucker * smallAlpha);
+			pt[j*k + i].set(x, y, z);
+			prex = x;
+			prey = y;
+			prez = z;
+			sucker -= deltaY;
+		}
+	}
+
+
+	/*numFaces = 2;
+	face = new Face[numFaces];
+	face[0].nVerts = k;
+	face[0].vert = new VertexID[k];
+	for (int i = k - 1; i >= 0; i--)
+	face[0].vert[k-i-1].vertIndex = i;
+
+	face[1].nVerts = k;
+	face[1].vert = new VertexID[k];
+	for (int i = 2*k - 1; i >= k; i--)
+	face[1].vert[2*k - i - 1].vertIndex = i;*/
+
+	numFaces = k * (numV - 1) + 1;
+	face = new Face[numFaces];
+	count = 0;
+	for (int i = 0; i < k; i++) {
+		for (int j = 0; j < numV - 1; j++) {
+			face[count].nVerts = 4;
+			face[count].vert = new VertexID[4];
+
+			face[count].vert[0].vertIndex = j * k + i;
+			face[count].vert[1].vertIndex = (j + 1) *k + i;
+			face[count].vert[2].vertIndex = (j + 1) *k + (i + 1) % k;
+			face[count].vert[3].vertIndex = j * k + (i + 1) % k;
+			count++;
+		}
+	}
+	face[count].nVerts = k;
+	face[count].vert = new VertexID[k];
+	for (int i = k - 1; i >= 0; i--) {
+		face[count].vert[i].vertIndex = (numV - 1)*k + i;
+	}
+}
+
+void Mesh::CreateWindowRight(int numVertexEachEdge, float alpha)
+{
+	numVerts = numVertexEachEdge * numVertexEachEdge;
+	pt = new Point3[numVerts];
+
+	float offset = 0.15f;
+
+	int count = 0;
+	float deltaY = 2.0f / (numVertexEachEdge - 1);
+	float deltaX = 2.5f / (numVertexEachEdge - 1);
+
+	for (int i = 0; i < numVertexEachEdge; i++) {
+		float x = -1.0f + i * deltaX;
+		float y = -1.0f;
+		float z = (x + 0.05f) * (x + 0.05f) + y * y;
+		pt[count].set(x, y, z);
+		count++;
+		//cout << count << " " << pt[count].x << " " << pt[count].y << " " << pt[count].z << endl;
+	}
+
+	float maxZ = 11.0f;
+	float maxY = -1.25f;
+	float sucker = 1.0f;
+
+	for (int i = 1; i < numVertexEachEdge; i++) {
+		for (int j = 0; j < numVertexEachEdge; j++) {
+			float alphaZ = (maxZ - pt[j].z) / (numVertexEachEdge - 1);
+			float z = pt[(i - 1)*numVertexEachEdge + j].z + alphaZ;
+			float x = pt[(i - 1)*numVertexEachEdge + j].x;
+			float alphaY = (maxY - pt[j].y) / (numVertexEachEdge - 1);
+			float y = pt[(i - 1)*numVertexEachEdge + j].y + (sucker*alpha + 1)*alphaY;
+			pt[i*numVertexEachEdge + j].set(x, y, z);
+		}
+		sucker -= deltaY;
+	}
+
+	numFaces = pow(numVertexEachEdge - 1, 2);
+	face = new Face[numFaces];
+
+	count = 0;
+
+	for (int i = 0; i < (numVertexEachEdge - 1); i++) {
+		for (int j = 0; j < (numVertexEachEdge - 1); j++) {
+			if (pt[i*numVertexEachEdge + j].z > 7.0f || pt[i*numVertexEachEdge + j].x < -0.5f) continue;
+			if (pt[i*numVertexEachEdge + j + 1].z > 7.0f) pt[i*numVertexEachEdge + j + 1].z = 7.0f;
+			face[count].nVerts = 4;
+			face[count].vert = new VertexID[4];
+
+			face[count].vert[0].vertIndex = i * numVertexEachEdge + j;
+			face[count].vert[1].vertIndex = i * numVertexEachEdge + j + 1;
+			face[count].vert[2].vertIndex = (i + 1) * numVertexEachEdge + j + 1;
+			face[count].vert[3].vertIndex = (i + 1) * numVertexEachEdge + j;
+
+			count++;
+		}
+	}
+}
+
+void Mesh::CreateWindowLeft(int numVertexEachEdge, float alpha)
+{
+	numVerts = numVertexEachEdge * numVertexEachEdge;
+	pt = new Point3[numVerts];
+
+	float offset = 0.15f;
+
+	int count = 0;
+	float deltaY = 2.0f / (numVertexEachEdge - 1);
+	float deltaX = 2.5f / (numVertexEachEdge - 1);
+
+	for (int i = 0; i < numVertexEachEdge; i++) {
+		float x = -1.0f + i * deltaX;
+		float y = 1.0f;
+		float z = (x + 0.05f) * (x + 0.05f) + y * y;
+		pt[count].set(x, y, z);
+		count++;
+		//cout << count << " " << pt[count].x << " " << pt[count].y << " " << pt[count].z << endl;
+	}
+
+	float maxZ = 11.0f;
+	float maxY = 1.25f;
+
+	float sucker = 1.0f;
+
+	for (int i = 1; i < numVertexEachEdge; i++) {
+		for (int j = 0; j < numVertexEachEdge; j++) {
+			float alphaZ = (maxZ - pt[j].z) / (numVertexEachEdge - 1);
+			float z = pt[(i - 1)*numVertexEachEdge + j].z + alphaZ;
+			float x = pt[(i - 1)*numVertexEachEdge + j].x;
+			float alphaY = (maxY - pt[j].y) / (numVertexEachEdge - 1);
+			float y = pt[(i - 1)*numVertexEachEdge + j].y + (sucker*alpha + 1)*alphaY;
+			pt[i*numVertexEachEdge + j].set(x, y, z);
+		}
+		sucker -= deltaY;
+	}
+
+	numFaces = pow(numVertexEachEdge - 1, 2);
+	face = new Face[numFaces];
+
+	count = 0;
+	for (int i = 0; i < (numVertexEachEdge - 1); i++) {
+		for (int j = 0; j < (numVertexEachEdge - 1); j++) {
+			if (pt[i*numVertexEachEdge + j].z > 7.0f || pt[i*numVertexEachEdge + j].x < -0.5f) continue;
+			if (pt[i*numVertexEachEdge + j + 1].z > 7.0f) pt[i*numVertexEachEdge + j + 1].z = 7.0f;
+			face[count].nVerts = 4;
+			face[count].vert = new VertexID[4];
+
+			face[count].vert[0].vertIndex = i * numVertexEachEdge + j;
+			face[count].vert[3].vertIndex = (i + 1) * numVertexEachEdge + j;
+			face[count].vert[2].vertIndex = (i + 1) * numVertexEachEdge + j + 1;
+			face[count].vert[1].vertIndex = i * numVertexEachEdge + j + 1;
+
+			count++;
+		}
 	}
 }

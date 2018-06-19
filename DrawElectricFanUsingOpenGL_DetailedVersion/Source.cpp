@@ -72,10 +72,10 @@ void onKeyboardDown(unsigned char key, int x, int y) {
 		upThetaState = 1;
 		break;
 	case '1':
-		theta += 1;
+		theta += 2;
 		break;
 	case '3':
-		theta -= 1;
+		theta -= 2;
 		break;
 	case '4':
 		L.y += 0.1;
@@ -173,14 +173,6 @@ void onMotion(int x, int y) {
 
 #pragma region drawTailFunc
 
-void drawCameraLens() {
-	Mesh camLens;
-	camLens.DrawCameraLens();
-	camLens.CalculateFacesNorm();
-	setMaterial(whiteplastic);
-	camLens.Draw();
-}
-
 void drawTailFanBlade(float angle) {
 	glPushMatrix(); {
 		Mesh blade;
@@ -212,10 +204,10 @@ void drawTailSwing() {
 void drawTailFanBox() {
 	Mesh tailFanPivot;
 	Mesh tailFanBox1, tailFanBox2, tailFanBox3;
-	tailFanPivot.CreateHoleCylinder(0.2, 360, 0, 0.15, 0.15);
-	tailFanBox1.CreateHoleCylinder(0.2, 360, 0.5, 0.7, 0.6);
-	tailFanBox2.CreateHoleCylinder(0.1, 360, 0.5, 0.7, 0.7);
-	tailFanBox3.CreateHoleCylinder(0.2, 360, 0.5, 0.6, 0.7);
+	tailFanPivot.CreateHoleCylinder(0.2, 36, 0, 0.15, 0.15);
+	tailFanBox1.CreateHoleCylinder(0.2, 36, 0.5, 0.7, 0.6);
+	tailFanBox2.CreateHoleCylinder(0.1, 36, 0.5, 0.7, 0.7);
+	tailFanBox3.CreateHoleCylinder(0.2, 36, 0.5, 0.6, 0.7);
 	glPushMatrix(); {
 		glTranslatef(0, 0.05, 0);
 		tailFanBox1.Draw();
@@ -237,8 +229,8 @@ void drawTailFanBox() {
 
 void drawTailPivot() {
 	Mesh bigTailPivot, smallTailPivot;
-	bigTailPivot.CreateEclipseCylinder(2.5, 360, 0.18, 0.15);
-	smallTailPivot.CreateEclipseCylinder(2.5, 360, 0.1, 0.05);
+	bigTailPivot.CreateEclipseCylinder(2.5, 36, 0.18, 0.15);
+	smallTailPivot.CreateEclipseCylinder(2.5, 36, 0.1, 0.05);
 	glPushMatrix(); {
 	glTranslatef(0, 0, 1);
 	glRotatef(90, 1, 0, 0);
@@ -305,16 +297,181 @@ void drawHeliTail() {
 
 void setUpTheta() {
 	if (upThetaState == 0) {
-		if (upTheta < 0) upTheta += 0.1;
-		else upTheta -= 0.1;
+		if (upTheta < 0) upTheta += 0.2;
+		else upTheta -= 0.2;
 	}
 	else if (upThetaState > 0){
-		upTheta += 0.2;
+		upTheta += 0.5;
 	}
-	else upTheta -= 0.2;
+	else upTheta -= 0.5;
 
 	if (upTheta > thetaAngle) upTheta = thetaAngle;
 	else if (upTheta < -thetaAngle) upTheta = -thetaAngle;
+}
+#pragma endregion
+
+#pragma region drawHeliBody
+void DrawHeliBody() {
+	int numVertexEachEdge = 40;
+	float alpha = 9.5f;
+	//drawCameraLens();
+
+	Mesh heli;
+	Mesh heliRightSide;
+	Mesh heliLeftSide;
+	Mesh heliTopSide;
+	Mesh heliTopGapRight;
+	Mesh heliTopGapLeft;
+	Mesh heliBotSide;
+	Mesh heliBotGapRight;
+	Mesh heliBotGapLeft;
+	Mesh heliRearBot;
+	Mesh heliRearTop;
+	Mesh heliRear;
+	Mesh heliRightWindow;
+	Mesh heliLeftWindow;
+	heli.CreateHeliFace(numVertexEachEdge);
+	heli.CalculateFacesNorm();
+	heliRightSide.CreateHeliFaceRightSide(numVertexEachEdge, alpha);
+	heliRightSide.CalculateFacesNorm();
+	heliLeftSide.CreateHeliFaceLeftSide(numVertexEachEdge, alpha);
+	heliLeftSide.CalculateFacesNorm();
+	heliTopSide.CreateHeliFaceTopSide(numVertexEachEdge, alpha * 2 / 5);
+	heliTopSide.CalculateFacesNorm();
+	heliTopGapRight.CreateHeliFaceTopSideGapRight(numVertexEachEdge, alpha * 2 / 5, alpha);
+	heliTopGapRight.CalculateFacesNorm();
+	heliTopGapLeft.CreateHeliFaceTopSideGapLeft(numVertexEachEdge, alpha * 2 / 5, alpha);
+	heliTopGapLeft.CalculateFacesNorm();
+	heliBotSide.CreateHeliFaceBotSide(numVertexEachEdge, alpha * 1 / 3);
+	heliBotSide.CalculateFacesNorm();
+	heliBotGapRight.CreateHeliFaceBotSideGapRight(numVertexEachEdge, alpha * 1 / 3, alpha);
+	heliBotGapRight.CalculateFacesNorm();
+	heliBotGapLeft.CreateHeliFaceBotSideGapLeft(numVertexEachEdge, alpha * 1 / 3, alpha);
+	heliBotGapLeft.CalculateFacesNorm();
+	heliRearBot.CreateHeliRearBotSide(numVertexEachEdge, 1.2, 0.4);
+	heliRearBot.CalculateFacesNorm();
+	heliRearTop.CreateHeliRearTopSide(numVertexEachEdge, 1, 0.4);
+	heliRearTop.CalculateFacesNorm();
+	heliRear.CreateHeliRear(numVertexEachEdge);
+	heliRear.CalculateFacesNorm();
+	heliRightWindow.CreateWindowRight(numVertexEachEdge, alpha);
+	heliRightWindow.CalculateFacesNorm();
+	heliLeftWindow.CreateWindowLeft(numVertexEachEdge, alpha);
+	heliLeftWindow.CalculateFacesNorm();
+	setMaterial(copper);
+	glPushMatrix();
+	glTranslatef(0, 0.05, 3);
+	glTranslatef(0, -0.5, 11 * 0.55*0.6);
+	glRotatef(90, 0, 0, 1);
+	glScalef(1 * 0.6, 1.35*0.6, -0.55*0.6);
+	//glTranslatef(0, 0, -13);
+	////glScalef(2.5, 2.5, 2.5);
+	heli.Draw();
+	heliRightSide.Draw();
+	heliLeftSide.Draw();
+	heliTopSide.Draw();
+	heliTopGapRight.Draw();
+	heliTopGapLeft.Draw();
+	heliBotSide.Draw();
+	heliBotGapRight.Draw();
+	heliBotGapLeft.Draw();
+	heliRear.Draw();
+
+	setMaterial(cyanplastic);
+	glPushMatrix();
+	glTranslatef(0.01, -0.05, -0.01);
+	heliRightWindow.Draw();
+	glPopMatrix();
+	glPushMatrix();
+	glTranslatef(0.01, +0.05, -0.01);
+	
+	heliLeftWindow.Draw();
+	glPopMatrix();
+
+	glPopMatrix();
+}
+#pragma endregion
+
+#pragma region drawSkidsFunc
+void drawSkidPart1() {
+	Mesh expShapeCylinder, cylinder1, cylinder2;
+	expShapeCylinder.CreateExpShapeCylinder(1.5f, 36, 2.0, 1.2, 100);
+	cylinder1.CreateCylinder(7.0f, 36, 0.6f);
+	cylinder2.CreateCylinder(10.0f, 36, 0.6f);
+	glPushMatrix();
+	glTranslatef(7.0f, 0, 0);
+	glScalef(0.5f, 0.5f, 0.5f);
+	expShapeCylinder.Draw();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(7.0f, 0.6f, 0);
+	glRotatef(90, 0, 0, 1);
+	cylinder1.Draw();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(9.2f, 7.55f, -2.5f);
+	glRotatef(90, 1, 0, 0);
+	cylinder2.Draw();
+	glPopMatrix();
+}
+
+void drawSkidPart2() {
+	glPushMatrix();
+	glTranslatef(0, 0, -7.5f);
+	drawSkidPart1();
+	glPushMatrix();
+	glScalef(-1, 1, 1);
+	drawSkidPart1();
+	glPopMatrix();
+	glPopMatrix();
+}
+
+void drawCuboidSkids() {
+	Mesh cuboidSkids;
+	cuboidSkids.CreateCuboid(20, 18, 0.7, 1, 0.6);
+	glPushMatrix();
+	glTranslatef(9.0f, -2.5f, 0);
+	glRotatef(135 + 180, 0, 0, 1);
+	cuboidSkids.Draw();
+	glPopMatrix();
+}
+
+void drawSkidHead() {
+	Mesh skidHead;
+	skidHead.CreateSkidHead(4.0f, 0.55, 36, 100);
+	glPushMatrix();
+	glTranslatef(9.2f, -5.1f, -14.5f);
+	glRotatef(-90, 0, 1, 0);
+	glRotatef(-90, 0, 0, 1);
+	skidHead.Draw();
+	glPopMatrix();
+}
+
+void drawSkids() {
+	setMaterial(polishedsilver);
+
+	glPushMatrix();
+	glRotatef(180, 0, 0, 1);
+	drawSkidPart2();
+	glPushMatrix();
+	glScalef(1, 1, -1);
+	drawSkidPart2();
+	glPopMatrix();
+	glPopMatrix();
+
+	drawCuboidSkids();
+	glPushMatrix();
+	glScalef(-1, 1, 1);
+	drawCuboidSkids();
+	glPopMatrix();
+
+	drawSkidHead();
+	glPushMatrix();
+	glScalef(-1, 1, 1);
+	drawSkidHead();
+	glPopMatrix();
 }
 #pragma endregion
 
@@ -372,19 +529,38 @@ void myDisplay() {
 
 #pragma endregion
 
-	//drawCameraLens();
 	drawAxis();
 
 	setUpTheta();
-
 	glTranslatef(L.x, L.y, L.z);
 	glRotatef(theta, 0, 1, 0);
 	glRotatef(-upTheta, 1, 0, 0);
-	drawHeliTail();
 
-	glFlush();
+
+	glPushMatrix(); {
+		glTranslatef(0, 0.8, 0);
+		glScalef(0.1, 0.1, -0.1);
+		drawSkids();
+	}
+	glPopMatrix();
+	
+	glPushMatrix(); {
+		glTranslatef(0, 1.7, -3.25);
+		glScalef(0.7, 0.8, 0.8);
+		DrawHeliBody();
+	}
+	glPopMatrix();
+
+
+
+	//glPushMatrix(); {
+		glTranslatef(0, 1.65, -3.7);
+		drawHeliTail();
+	//}
+	//glPopMatrix();
+
 	glutSwapBuffers();
-	//upTheta = 0;
+	glFlush();
 }
 
 
@@ -407,7 +583,6 @@ int main(int argc, CHAR* argv[]) {
 
 	L.set(0, 0, 0);
 	theta = upTheta = 0;
-
 	glutMainLoop();
 	return 0;
 }
