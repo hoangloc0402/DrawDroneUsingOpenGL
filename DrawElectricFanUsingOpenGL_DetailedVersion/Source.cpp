@@ -56,7 +56,7 @@ void drawAxis() {
 //Các hàm callback
 #pragma region Callback Func
 void processTimer(int value) {
-	angle += 5;
+	angle += 10;
 	if (angle > 360.0f) angle -= 360.0f;
 	glutTimerFunc(fanSpeed, processTimer, value);
 	glutPostRedisplay();
@@ -73,27 +73,27 @@ void onKeyboardDown(unsigned char key, int x, int y) {
 		//smallBladeSpeed -= 2;
 		break;
 	case '5':
-		L.z += 0.1*cos(theta*DEG2RAD);
-		L.x += 0.1*sin(theta*DEG2RAD);
+		L.z += 0.5*cos(theta*DEG2RAD);
+		L.x += 0.5*sin(theta*DEG2RAD);
 		upThetaState = -1;
 		break;
 	case '2':
-		L.z -= 0.1*cos(theta*DEG2RAD);
-		L.x -= 0.1*sin(theta*DEG2RAD);
+		L.z -= 0.3*cos(theta*DEG2RAD);
+		L.x -= 0.3*sin(theta*DEG2RAD);
 		upThetaState = 1;
 		break;
 	case '1':
-		theta += 2;
+		theta += 4;
 		break;
 	case '3':
-		theta -= 2;
+		theta -= 4;
 		break;
 	case '4':
-		L.y += 0.1;
+		L.y += 0.4;
 		upThetaState = 1;
 		break;
 	case '6':
-		L.y -= 0.1;
+		L.y -= 0.4;
 		upThetaState = -1;
 		break;
 	case 'v':
@@ -399,6 +399,8 @@ void drawSkidPart1() {
 	expShapeCylinder.CreateExpShapeCylinder(1.5f, 36, 2.0, 1.2, 100);
 	cylinder1.CreateCylinder(7.0f, 36, 0.6f);
 	cylinder2.CreateCylinder(10.0f, 36, 0.6f);
+
+
 	glPushMatrix();
 	glTranslatef(7.0f, 0, 0);
 	glScalef(0.5f, 0.5f, 0.5f);
@@ -473,6 +475,14 @@ void drawSkids() {
 	glScalef(-1, 1, 1);
 	drawSkidHead();
 	glPopMatrix();
+
+	//Mesh pannel;
+	//pannel.CreatePanel(0.3, 0.15, 0.04, 0.02);
+	//
+	//	glTranslatef(0, 3, 0);
+	//	glScalef(2, 2, 2);
+	//	pannel.Draw();
+
 }
 #pragma endregion
 
@@ -489,14 +499,14 @@ void drawHeliMachine() {
 
 void drawHeliFan() {
 	Mesh fanAdapter, heliFan, fanCylinder;
-	heliFan.CreateHeliFan(10, 1, 0.05, 40);
+	heliFan.CreateHeliFan(10, 1, 0.05, 20);
 	heliFan.Draw();
-	fanAdapter.CreateFanAdapter(0.05, 40, 0.5);
+	fanAdapter.CreateFanAdapter(0.05, 20, 0.5);
 	glPushMatrix();
 	glTranslatef(10, 0.5, 0);
 	fanAdapter.Draw();
 	glPopMatrix();
-	fanCylinder.CreateCylinder(2.5, 36, 0.05);
+	fanCylinder.CreateCylinder(2.5, 10, 0.05);
 	glPushMatrix();
 	glTranslatef(10, 0.5, 0);
 	glRotatef(-90, 0, 0, 1);
@@ -506,15 +516,15 @@ void drawHeliFan() {
 
 void drawHeliRoto() {
 	Mesh rotoMushroomShape, cylinder, holeCylinder1, holeCylinder2;
-	rotoMushroomShape.CreateMushroomShape(4.0f, 5, 0, 360, 100);
+	rotoMushroomShape.CreateMushroomShape(4.0f, 5, 0, 36, 100);
 	cylinder.CreateCylinder(8, 360, 1);
 	glPushMatrix();
 	glTranslatef(0, 8.0f, 0);
 	rotoMushroomShape.Draw();
 	glPopMatrix();
 	cylinder.Draw();
-	holeCylinder1.CreateHoleCylinder(1, 36, 1, 1.2, 2.5);
-	holeCylinder2.CreateHoleCylinder(1, 36, 1, 2.5, 1.2);
+	holeCylinder1.CreateHoleCylinder(1, 10, 1, 1.2, 2.5);
+	holeCylinder2.CreateHoleCylinder(1, 10, 1, 2.5, 1.2);
 
 	glPushMatrix();
 	glTranslatef(0, 5.0f, 0);
@@ -552,8 +562,8 @@ void drawFan(float fallAngle) {
 
 void setUpAngle() {
 	if (upThetaState == 0) {
-		if (upTheta < 0) upTheta += 0.2;
-		else upTheta -= 0.2;
+		if (upTheta < 0) upTheta += 0.5;
+		else upTheta -= 0.5;
 	}
 	else if (upThetaState > 0) {
 		upTheta += 0.5;
@@ -626,31 +636,31 @@ void myDisplay() {
 	glBindTexture(GL_TEXTURE_2D, floorTex.texID);
 	glColor4f(1, 1, 1, 1.0);
 	glBegin(GL_QUADS);
-	glTexCoord2f(0, 0); glVertex3f(-15, 0, -15);
-	glTexCoord2f(0, 1); glVertex3f(-15, 0, 15);
-	glTexCoord2f(1, 1); glVertex3f(15, 0, 15);
-	glTexCoord2f(1, 0); glVertex3f(15, 0, -15);
+	glTexCoord2f(0, 0); glVertex3f(-150, 0, -150);
+	glTexCoord2f(0, 1); glVertex3f(-150, 0, 150);
+	glTexCoord2f(1, 1); glVertex3f(150, 0, 150);
+	glTexCoord2f(1, 0); glVertex3f(150, 0, -150);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_LIGHTING);
 
 		#pragma region Light
 
-	GLfloat	lightDiffuse[] = { 0.6f,  0.6f,  0.6f,  1.0f };
-	GLfloat	lightSpecular[] = { 0.6f,  0.6f,  0.6f,  1.0f };
-	GLfloat	lightAmbient[] = { 0.4f,  0.4f,  0.4f,  1.0f };
-	GLfloat light_position[] = {3.0f, 3.0f, 3.0f, 1.0f };
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
+	//GLfloat	lightDiffuse[] = { 0.6f,  0.6f,  0.6f,  1.0f };
+	//GLfloat	lightSpecular[] = { 0.6f,  0.6f,  0.6f,  1.0f };
+	//GLfloat	lightAmbient[] = { 0.4f,  0.4f,  0.4f,  1.0f };
+	//GLfloat light_position[] = {3.0f, 3.0f, 3.0f, 1.0f };
+	//glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	//glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
+	//glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
+	//glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
+	//glEnable(GL_LIGHTING);
+	//glEnable(GL_LIGHT0);
 
 	GLfloat	lightDiffuse1[] = {0.7f,  0.7f,  0.7f,  0.2f };
 	GLfloat	lightSpecular1[] = { 0.7f,  0.7f,  0.7f,  0.8f };
 	GLfloat	lightAmbient1[] = { 0.4f,  0.4f,  0.4f,  0.6f };
-	GLfloat light_position1[] = { 6.0f, 0.0f, 0.0f, 0.3f };
+	GLfloat light_position1[] = { 60.0f, 0.0f, 0.0f, 0.3f };
 	glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
 	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
@@ -659,9 +669,9 @@ void myDisplay() {
 	glEnable(GL_LIGHT1);
 
 	GLfloat	lightDiffuse2[] = { 0.3f,  0.3f, 0.3f,  0.5f };
-	GLfloat	lightSpecular2[] = { 0.3f,  0.3f, 0.3f,  .20f };
+	GLfloat	lightSpecular2[] = { 0.3f,  0.3f, 0.3f,  .2f };
 	GLfloat	lightAmbient2[] = { 0.4f,  0.4f,  0.4f,  0.3f };
-	GLfloat light_position2[] = { 0.0f, 6.0f, 0.0f, 0.8f };
+	GLfloat light_position2[] = { 0.0f, 60.0f, 0.0f, 0.8f };
 	glLightfv(GL_LIGHT2, GL_POSITION, light_position2);
 	glLightfv(GL_LIGHT2, GL_DIFFUSE, lightDiffuse2);
 	glLightfv(GL_LIGHT2, GL_AMBIENT, lightAmbient2);
@@ -705,7 +715,7 @@ void myDisplay() {
 	glPopMatrix();
 
 	//glPushMatrix(); {
-		glTranslatef(0, 1.65, -3.7);
+		glTranslatef(0, 1.65, -3.9);
 		drawHeliTail();
 	//}
 	//glPopMatrix();
