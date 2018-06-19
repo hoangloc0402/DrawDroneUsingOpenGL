@@ -84,6 +84,8 @@ public:
 		void CreateSkidHead(float length, float cyRadius, int solidity, int numCycle);
 		void CreateHeliMachine(float height, float radius, int solidity, int numSlice);
 		void CreateMushroomShape(float height, float bigRadius, float smallRadius, int solidity, int numSlice);
+		void CreateHeliFan(float length, float width, float thickness, int numSlice);
+		void CreateFanAdapter(float thickness, int numSlice, float length);
 
 //---------------------------------------------------------------------------------------------------------------------------------------
 		//Tien

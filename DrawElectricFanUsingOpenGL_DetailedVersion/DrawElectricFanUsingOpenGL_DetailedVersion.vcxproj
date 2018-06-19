@@ -124,6 +124,7 @@
     <ClInclude Include="MaterialColor.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="supportClass.h" />
+    <ClInclude Include="Tga.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

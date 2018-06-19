@@ -664,6 +664,140 @@ void Mesh::CreateMushroomShape(float height, float bigRadius, float smallRadius,
 	CalculateFacesNorm();
 }
 
+void Mesh::CreateHeliFan(float length, float width, float thickness, int numSlice) {
+	numVerts = numSlice * 4;
+	numFaces = (numSlice - 1) * 4;
+	pt = new Point3[numVerts];
+	float paraLength = width;
+	float deltaL = paraLength / (numSlice - 2);
+	for (int i = 0; i < numSlice - 1; i++) {
+		float temp;
+		pt[i].y = temp = deltaL * i;
+		pt[i].x = temp * temp;
+		pt[i].z = thickness / 2;
+
+		pt[i + numSlice].y = temp = deltaL * i;
+		pt[i + numSlice].x = temp * temp;
+		pt[i + numSlice].z = -thickness / 2;
+
+		pt[i + numSlice * 2].y = 0;
+		pt[i + numSlice * 2].x = temp * temp;
+		pt[i + numSlice * 2].z = thickness / 2;
+
+		pt[i + numSlice * 3].y = 0;
+		pt[i + numSlice * 3].x = temp * temp;
+		pt[i + numSlice * 3].z = -thickness / 2;
+	}
+
+	pt[numSlice - 1].x = length;
+	pt[numSlice - 1].y = paraLength;
+	pt[numSlice - 1].z = thickness / 2;
+
+	pt[numSlice - 1 + numSlice].x = length;
+	pt[numSlice - 1 + numSlice].y = paraLength;
+	pt[numSlice - 1 + numSlice].z = -thickness / 2;
+
+	pt[numSlice - 1 + numSlice * 2].x = length;
+	pt[numSlice - 1 + numSlice * 2].y = 0;
+	pt[numSlice - 1 + numSlice * 2].z = thickness / 2;
+
+	pt[numSlice - 1 + numSlice * 3].x = length;
+	pt[numSlice - 1 + numSlice * 3].y = 0;
+	pt[numSlice - 1 + numSlice * 3].z = -thickness / 2;
+
+	face = new Face[numFaces];
+
+	for (int i = 0; i < numSlice - 1; i++) {
+		face[i].nVerts = 4;
+		face[i].vert = new VertexID[4];
+		face[i].vert[0].vertIndex = i;
+		face[i].vert[1].vertIndex = i + numSlice * 2;
+		face[i].vert[2].vertIndex = i + 1 + numSlice * 2;
+		face[i].vert[3].vertIndex = i + 1;
+
+		face[i + (numSlice - 1)].nVerts = 4;
+		face[i + (numSlice - 1)].vert = new VertexID[4];
+		face[i + (numSlice - 1)].vert[0].vertIndex = i;
+		face[i + (numSlice - 1)].vert[1].vertIndex = i + 1;
+		face[i + (numSlice - 1)].vert[2].vertIndex = i + numSlice + 1;
+		face[i + (numSlice - 1)].vert[3].vertIndex = i + numSlice;
+
+		face[i + (numSlice - 1) * 2].nVerts = 4;
+		face[i + (numSlice - 1) * 2].vert = new VertexID[4];
+		face[i + (numSlice - 1) * 2].vert[0].vertIndex = i + numSlice;
+		face[i + (numSlice - 1) * 2].vert[1].vertIndex = i + 1 + numSlice;
+		face[i + (numSlice - 1) * 2].vert[2].vertIndex = i + numSlice * 3 + 1;
+		face[i + (numSlice - 1) * 2].vert[3].vertIndex = i + numSlice * 3;
+
+		face[i + (numSlice - 1) * 3].nVerts = 4;
+		face[i + (numSlice - 1) * 3].vert = new VertexID[4];
+		face[i + (numSlice - 1) * 3].vert[0].vertIndex = i + numSlice * 2;
+		face[i + (numSlice - 1) * 3].vert[1].vertIndex = i + numSlice * 3;
+		face[i + (numSlice - 1) * 3].vert[2].vertIndex = i + numSlice * 3 + 1;
+		face[i + (numSlice - 1) * 3].vert[3].vertIndex = i + numSlice * 2 + 1;
+	}
+
+	CalculateFacesNorm();
+}
+
+void Mesh::CreateFanAdapter(float thickness, int numSlice, float length) {
+	numVerts = numSlice * 4;
+	numFaces = (numSlice - 1) * 4;
+	pt = new Point3[numVerts];
+	float deltaL = length / (numSlice - 1);
+	for (int i = 0; i < numSlice; i++) {
+		float temp;
+		pt[i].y = temp = deltaL * i;
+		pt[i].x = length - 2 * temp*temp;
+		pt[i].z = thickness / 2;
+
+		pt[i + numSlice].y = deltaL * i;
+		pt[i + numSlice].x = length - 2 * temp*temp;
+		pt[i + numSlice].z = -thickness / 2;
+
+		pt[i + numSlice * 2].y = temp = -deltaL * i;
+		pt[i + numSlice * 2].x = length - 2 * temp*temp;
+		pt[i + numSlice * 2].z = thickness / 2;
+
+		pt[i + numSlice * 3].y = -deltaL * i;
+		pt[i + numSlice * 3].x = length - 2 * temp*temp;
+		pt[i + numSlice * 3].z = -thickness / 2;
+	}
+	face = new Face[numFaces];
+
+	for (int i = 0; i < numSlice - 1; i++) {
+		face[i].nVerts = 4;
+		face[i].vert = new VertexID[4];
+		face[i].vert[0].vertIndex = i;
+		face[i].vert[1].vertIndex = i + numSlice * 2;
+		face[i].vert[2].vertIndex = i + 1 + numSlice * 2;
+		face[i].vert[3].vertIndex = i + 1;
+
+		face[i + (numSlice - 1)].nVerts = 4;
+		face[i + (numSlice - 1)].vert = new VertexID[4];
+		face[i + (numSlice - 1)].vert[0].vertIndex = i;
+		face[i + (numSlice - 1)].vert[1].vertIndex = i + 1;
+		face[i + (numSlice - 1)].vert[2].vertIndex = i + numSlice + 1;
+		face[i + (numSlice - 1)].vert[3].vertIndex = i + numSlice;
+
+		face[i + (numSlice - 1) * 2].nVerts = 4;
+		face[i + (numSlice - 1) * 2].vert = new VertexID[4];
+		face[i + (numSlice - 1) * 2].vert[0].vertIndex = i + numSlice;
+		face[i + (numSlice - 1) * 2].vert[1].vertIndex = i + 1 + numSlice;
+		face[i + (numSlice - 1) * 2].vert[2].vertIndex = i + numSlice * 3 + 1;
+		face[i + (numSlice - 1) * 2].vert[3].vertIndex = i + numSlice * 3;
+
+		face[i + (numSlice - 1) * 3].nVerts = 4;
+		face[i + (numSlice - 1) * 3].vert = new VertexID[4];
+		face[i + (numSlice - 1) * 3].vert[0].vertIndex = i + numSlice * 2;
+		face[i + (numSlice - 1) * 3].vert[1].vertIndex = i + numSlice * 3;
+		face[i + (numSlice - 1) * 3].vert[2].vertIndex = i + numSlice * 3 + 1;
+		face[i + (numSlice - 1) * 3].vert[3].vertIndex = i + numSlice * 2 + 1;
+	}
+
+	CalculateFacesNorm();
+}
+
 //---------------------------------------------------------------------------------------------------------------------------------------
 //Tien
 void Mesh::CreateHeliFace(int numVertexEachEdge) {
@@ -1644,7 +1778,7 @@ void Mesh::CreateHeliRear(int numVertexEachEdge) {
 	for (int j = 0; j < numVertexEachEdge; j++) {
 		float z = maxZ;
 		float y = 1.0 - deltaY * j;
-		float x = maxX - .015;
+		float x = maxX - .025;
 		pt[k].set(x, y, z);
 		k++;
 	}
@@ -1656,11 +1790,11 @@ void Mesh::CreateHeliRear(int numVertexEachEdge) {
 
 	float smallAlpha = 0.5;
 	float sucker = 1.0;
-	float preX = -1.15 - .015;
+	float preX = -1.15 - .025;
 	float preY = -1;
 	for (int j = 0; j < numV; j++) {
 		float Ax = (-1.15 + 1) / numV;
-		float Ay = (-1.25 - .03 + 1) / numV;
+		float Ay = (-1.25 - .12 + 1) / numV;
 		float x = preX - Ax;
 		float y = preY + (sucker*smallAlpha + 1)*Ay;
 		float z = 11;
@@ -1676,14 +1810,14 @@ void Mesh::CreateHeliRear(int numVertexEachEdge) {
 	//right
 
 	maxZ = 11.0f;
-	float maxY = -1.25f;
+	float maxY = -1.25 - .12;
 	sucker = 1.0f;
 
 	for (int j = 1; j < numVertexEachEdge; j++) {
 		float z = 11.0;
 		float x = -1.0 + deltaX * j;
 		//float alphaY = (maxY - pt[j].y) / (numVertexEachEdge - 1);
-		float y = -1.25 - .03;
+		float y = -1.25 - .12;
 		pt[k].set(x, y, z);
 		k++;
 	}
@@ -1697,9 +1831,9 @@ void Mesh::CreateHeliRear(int numVertexEachEdge) {
 	smallAlpha = 0.5;
 	sucker = 1.0;
 	preX = 1.5;
-	preY = -1.25 - .03;
+	preY = -1.25 - .12;
 	for (int j = 1; j < numV; j++) {
-		float Ax = (1.75 - 1.5) / numV;
+		float Ax = (1.75 + .05 - 1.5) / numV;
 		float Ay = (-1.0 + 1.25 + .03) / numV;
 		float x = preX + Ax;
 		float y = preY + (sucker*smallAlpha + 1)*Ay;
@@ -1742,7 +1876,7 @@ void Mesh::CreateHeliRear(int numVertexEachEdge) {
 	for (int j = 0; j < numVertexEachEdge; j++) {
 		float z = maxZ;
 		float y = -1.0f + 2.0f / (numVertexEachEdge - 1) * j;
-		float x = maxX + .015;
+		float x = maxX + .05;
 		pt[k].set(x, y, z);
 		k++;
 	}
@@ -1755,11 +1889,11 @@ void Mesh::CreateHeliRear(int numVertexEachEdge) {
 
 	smallAlpha = 0.5;
 	sucker = 1.0;
-	preX = 1.75;
+	preX = 1.75 + .05;
 	preY = 1.0;
 	for (int j = 0; j < numV; j++) {
 		float Ax = (1.5 - 1.75) / numV;
-		float Ay = (1.25 + .03 - 1) / numV;
+		float Ay = (1.25 + .12 - 1) / numV;
 		float x = preX + Ax;
 		float y = preY + (sucker*smallAlpha + 1)*Ay;
 		float z = 11.0;
@@ -1781,7 +1915,7 @@ void Mesh::CreateHeliRear(int numVertexEachEdge) {
 		float z = 11.0;
 		float x = -1.0 + deltaX * (numVertexEachEdge - j - 1);
 		//float alphaY = (maxY - pt[j].y) / (numVertexEachEdge - 1);
-		float y = 1.25 + .03;
+		float y = 1.25 + .12;
 		pt[k].set(x, y, z);
 		k++;
 	}
@@ -1792,13 +1926,14 @@ void Mesh::CreateHeliRear(int numVertexEachEdge) {
 
 	deltaY = 2.0f / (numV - 1);
 
+
 	smallAlpha = 0.5;
 	sucker = 1.0;
 	preX = -1.0;
-	preY = 1.25 + .03;
+	preY = 1.25 + .12;
 	for (int j = 0; j < numV; j++) {
-		float Ax = (-1.15 + 1) / numV;
-		float Ay = (-1.25 - .03 + 1) / numV;
+		float Ax = (-1.15 - .025 + 1) / numV;
+		float Ay = (-1.25 - .12 + 1) / numV;
 		float x = preX + Ax;
 		float y = preY + (sucker*smallAlpha + 1)*Ay;
 		float z = 11.0;
@@ -1811,7 +1946,7 @@ void Mesh::CreateHeliRear(int numVertexEachEdge) {
 		sucker -= deltaY;
 	}
 	smallAlpha = 0.7;
-	numV = 50;
+	numV = 120;
 	deltaY = 2.0f / (numV - 1);
 
 	for (int i = 0; i < k; i++) {

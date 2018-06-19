@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "glut.h"
 #include "MaterialColor.h"
+#include "Tga.h"
 
 #define DEG2RAD (3.14159f/180.0f)
 
@@ -14,7 +15,9 @@ using namespace std;
 GLfloat angle;
 int		screenWidth = 800;
 int		screenHeight = 800;
-int smallBladeSpeed = 0; //Tốc độ quạt, ấn "+" "-" để thay đổi
+//int smallBladeSpeed = 0;
+
+Texture floorTex;
 
 int o_x, o_y;
 float eyeX, eyeY, eyeZ;
@@ -28,6 +31,12 @@ Point3 L;
 float theta, upTheta;
 float thetaAngle = 15.0;
 int upThetaState = 0;
+float fallAngle = 30.0;
+float maxFallAngle = 18.0;
+float fanSpeed = 50;
+float maxFanSpeed = 50;
+bool isHelicopterView = false;
+bool isRotatingBlade = false;
 
 
 //Vẽ trục toạ độ
@@ -47,19 +56,21 @@ void drawAxis() {
 //Các hàm callback
 #pragma region Callback Func
 void processTimer(int value) {
-	angle += (GLfloat)value / 5;
+	angle += 5;
 	if (angle > 360.0f) angle -= 360.0f;
-	glutTimerFunc(5, processTimer, value);
+	glutTimerFunc(fanSpeed, processTimer, value);
 	glutPostRedisplay();
 }
 
 void onKeyboardDown(unsigned char key, int x, int y) {
 	switch (key) {
 	case '+':
-		smallBladeSpeed += 2;
+		isRotatingBlade = true;
+		//smallBladeSpeed += 2;
 		break;
 	case '-':
-		smallBladeSpeed -= 2;
+		isRotatingBlade = false;
+		//smallBladeSpeed -= 2;
 		break;
 	case '5':
 		L.z += 0.1*cos(theta*DEG2RAD);
@@ -85,14 +96,17 @@ void onKeyboardDown(unsigned char key, int x, int y) {
 		L.y -= 0.1;
 		upThetaState = -1;
 		break;
-
+	case 'v':
+		isHelicopterView = !isHelicopterView;
+		break;
 	default:
 		upTheta = 0;
 		break;
 	}
 
-	if (smallBladeSpeed > 20) smallBladeSpeed = 20;
-	else if (smallBladeSpeed < 0) smallBladeSpeed = 0;
+	if (L.y < 0) L.y = 0;
+	//if (smallBladeSpeed > 20) smallBladeSpeed = 20;
+	//else if (smallBladeSpeed < 0) smallBladeSpeed = 0;
 	glutPostRedisplay();
 }
 
@@ -116,10 +130,10 @@ void onKeyboardUp(unsigned char key, int x, int y) {
 		break;
 	}
 
-	if (smallBladeSpeed > 20) smallBladeSpeed = 20;
-	else if (smallBladeSpeed < 0) smallBladeSpeed = 0;
-	if (upTheta > thetaAngle) upTheta = thetaAngle;
-	else if (upTheta < -thetaAngle) upTheta = -thetaAngle;
+	//if (smallBladeSpeed > 20) smallBladeSpeed = 20;
+	//else if (smallBladeSpeed < 0) smallBladeSpeed = 0;
+	//if (upTheta > thetaAngle) upTheta = thetaAngle;
+	//else if (upTheta < -thetaAngle) upTheta = -thetaAngle;
 	glutPostRedisplay();
 }
 
@@ -220,7 +234,7 @@ void drawTailFanBox() {
 		glTranslatef(0, 0.15, 0);
 		tailFanPivot.Draw();
 
-		glRotatef(-smallBladeSpeed*angle/2, 0 ,1, 0);
+		glRotatef(angle/2, 0 ,1, 0);
 		for (int i = 0; i < 360; i += 45)
 			drawTailFanBlade(i);
 	}
@@ -295,24 +309,11 @@ void drawHeliTail() {
 	
 }
 
-void setUpTheta() {
-	if (upThetaState == 0) {
-		if (upTheta < 0) upTheta += 0.2;
-		else upTheta -= 0.2;
-	}
-	else if (upThetaState > 0){
-		upTheta += 0.5;
-	}
-	else upTheta -= 0.5;
-
-	if (upTheta > thetaAngle) upTheta = thetaAngle;
-	else if (upTheta < -thetaAngle) upTheta = -thetaAngle;
-}
 #pragma endregion
 
 #pragma region drawHeliBody
 void DrawHeliBody() {
-	int numVertexEachEdge = 40;
+	int numVertexEachEdge = 20;
 	float alpha = 9.5f;
 	//drawCameraLens();
 
@@ -475,6 +476,130 @@ void drawSkids() {
 }
 #pragma endregion
 
+#pragma region Fan
+void drawHeliMachine() {
+	Mesh heliMachine;
+	heliMachine.CreateHeliMachine(2.5f, 20, 37, 100);
+	glPushMatrix();
+	glScalef(0.3, 0.3, 0.3);
+	glTranslatef(-14.5, 0, 0);
+	heliMachine.Draw();
+	glPopMatrix();
+}
+
+void drawHeliFan() {
+	Mesh fanAdapter, heliFan, fanCylinder;
+	heliFan.CreateHeliFan(10, 1, 0.05, 40);
+	heliFan.Draw();
+	fanAdapter.CreateFanAdapter(0.05, 40, 0.5);
+	glPushMatrix();
+	glTranslatef(10, 0.5, 0);
+	fanAdapter.Draw();
+	glPopMatrix();
+	fanCylinder.CreateCylinder(2.5, 36, 0.05);
+	glPushMatrix();
+	glTranslatef(10, 0.5, 0);
+	glRotatef(-90, 0, 0, 1);
+	fanCylinder.Draw();
+	glPopMatrix();
+}
+
+void drawHeliRoto() {
+	Mesh rotoMushroomShape, cylinder, holeCylinder1, holeCylinder2;
+	rotoMushroomShape.CreateMushroomShape(4.0f, 5, 0, 360, 100);
+	cylinder.CreateCylinder(8, 360, 1);
+	glPushMatrix();
+	glTranslatef(0, 8.0f, 0);
+	rotoMushroomShape.Draw();
+	glPopMatrix();
+	cylinder.Draw();
+	holeCylinder1.CreateHoleCylinder(1, 36, 1, 1.2, 2.5);
+	holeCylinder2.CreateHoleCylinder(1, 36, 1, 2.5, 1.2);
+
+	glPushMatrix();
+	glTranslatef(0, 5.0f, 0);
+	holeCylinder1.Draw();
+	glTranslatef(0, 1, 0);
+	holeCylinder2.Draw();
+	glPopMatrix();
+}
+
+void drawAFan(float fallAngle) {
+	glPushMatrix();
+	glTranslatef(0, 2.7f, 0);
+	glRotatef(fallAngle, 0, 0, 1);
+	glTranslatef(-12.5, 0, 0);
+	glRotatef(60, 1, 0, 0);
+	glTranslatef(0, -0.5, 0);
+	drawHeliFan();
+	glPopMatrix();
+}
+
+void drawFan(float fallAngle) {
+	glPushMatrix();
+	glScalef(0.3, 0.3, 0.3);
+	drawHeliRoto();
+	glPopMatrix();
+	drawAFan(fallAngle);
+	for (int i = 1; i < 4; i++) {
+		glPushMatrix();
+		glRotatef(90 * i, 0, 1, 0);
+		drawAFan(fallAngle);
+		glPopMatrix();
+	}
+}
+#pragma endregion
+
+void setUpAngle() {
+	if (upThetaState == 0) {
+		if (upTheta < 0) upTheta += 0.2;
+		else upTheta -= 0.2;
+	}
+	else if (upThetaState > 0) {
+		upTheta += 0.5;
+	}
+	else upTheta -= 0.5;
+
+	if (upTheta > thetaAngle) upTheta = thetaAngle;
+	else if (upTheta < -thetaAngle) upTheta = -thetaAngle;
+
+
+	if (isRotatingBlade) { 
+		fallAngle -= 1; 
+		fanSpeed -= 0.5;
+	}
+	else {
+		fallAngle += 1;
+		fanSpeed += 0.5;
+	}
+	if (fallAngle < 0) 
+		fallAngle = 0;
+	else if (fallAngle > maxFallAngle) 
+		fallAngle = maxFallAngle;
+	if (fanSpeed < 0) 
+		fanSpeed = 0;
+	else if (fanSpeed > maxFanSpeed) 
+		fanSpeed = maxFanSpeed;
+}
+
+void loadTextures(void) {
+	char texFile[12] = "grass.tga";
+	bool status = LoadTGA(&floorTex, texFile);
+	if (status) {
+		glGenTextures(1, &floorTex.texID);
+		glBindTexture(GL_TEXTURE_2D, floorTex.texID);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+			GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+			GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, floorTex.width,
+			floorTex.height, 0,
+			GL_RGB, GL_UNSIGNED_BYTE, floorTex.imageData);
+		if (floorTex.imageData)
+			free(floorTex.imageData);
+	}
+}
+
 void myDisplay() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -490,7 +615,24 @@ void myDisplay() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(1, 1, 1, 1);
 	glViewport(0, 0, screenWidth, screenHeight);
-	gluLookAt(eyeX, eyeY, eyeZ, 0, 0, 0, 0, 1, 0);
+	if (isHelicopterView) {
+		gluLookAt(-L.x * 2, L.y + sin(upTheta*DEG2RAD), -L.z * 2, L.x, L.y, L.z, 0, 1, 0);
+	}
+	else gluLookAt(eyeX, eyeY, eyeZ, 0, 0, 0, 0, 1, 0);
+
+	loadTextures();
+	glDisable(GL_LIGHTING);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, floorTex.texID);
+	glColor4f(1, 1, 1, 1.0);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0, 0); glVertex3f(-15, 0, -15);
+	glTexCoord2f(0, 1); glVertex3f(-15, 0, 15);
+	glTexCoord2f(1, 1); glVertex3f(15, 0, 15);
+	glTexCoord2f(1, 0); glVertex3f(15, 0, -15);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	glEnable(GL_LIGHTING);
 
 		#pragma region Light
 
@@ -531,7 +673,7 @@ void myDisplay() {
 
 	drawAxis();
 
-	setUpTheta();
+	setUpAngle();
 	glTranslatef(L.x, L.y, L.z);
 	glRotatef(theta, 0, 1, 0);
 	glRotatef(-upTheta, 1, 0, 0);
@@ -539,7 +681,7 @@ void myDisplay() {
 
 	glPushMatrix(); {
 		glTranslatef(0, 0.8, 0);
-		glScalef(0.1, 0.1, -0.1);
+		glScalef(0.1, 0.08, -0.1);
 		drawSkids();
 	}
 	glPopMatrix();
@@ -551,7 +693,16 @@ void myDisplay() {
 	}
 	glPopMatrix();
 
-
+	glPushMatrix(); {
+		glTranslatef(0, 2.2, -0.2);
+		glScalef(0.25, 0.25, 0.25);
+		glRotatef(90, 0, 1, 0);
+		drawHeliMachine();
+		if (fanSpeed < maxFanSpeed)
+			glRotatef(angle*10, 0, 1, 0);
+		drawFan(fallAngle);
+	}
+	glPopMatrix();
 
 	//glPushMatrix(); {
 		glTranslatef(0, 1.65, -3.7);
