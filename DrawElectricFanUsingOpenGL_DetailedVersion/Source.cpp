@@ -8,6 +8,7 @@
 #include "MaterialColor.h"
 
 #define DEG2RAD (3.14159f/180.0f)
+
 using namespace std;
 
 GLfloat angle;
@@ -24,7 +25,10 @@ float dR = 0.2;
 float Radius = 4;
 
 Point3 L;
-int theta;
+float theta, upTheta;
+float thetaAngle = 15.0;
+int upThetaState = 0;
+
 
 //Vẽ trục toạ độ
 void drawAxis() {
@@ -49,7 +53,7 @@ void processTimer(int value) {
 	glutPostRedisplay();
 }
 
-void onKeyboard(unsigned char key, int x, int y) {
+void onKeyboardDown(unsigned char key, int x, int y) {
 	switch (key) {
 	case '+':
 		smallBladeSpeed += 2;
@@ -60,10 +64,12 @@ void onKeyboard(unsigned char key, int x, int y) {
 	case '5':
 		L.z += 0.1*cos(theta*DEG2RAD);
 		L.x += 0.1*sin(theta*DEG2RAD);
+		upThetaState = -1;
 		break;
 	case '2':
 		L.z -= 0.1*cos(theta*DEG2RAD);
 		L.x -= 0.1*sin(theta*DEG2RAD);
+		upThetaState = 1;
 		break;
 	case '1':
 		theta += 1;
@@ -73,12 +79,16 @@ void onKeyboard(unsigned char key, int x, int y) {
 		break;
 	case '4':
 		L.y += 0.1;
+		upThetaState = 1;
 		break;
 	case '6':
 		L.y -= 0.1;
+		upThetaState = -1;
 		break;
 
-	default:break;
+	default:
+		upTheta = 0;
+		break;
 	}
 
 	if (smallBladeSpeed > 20) smallBladeSpeed = 20;
@@ -86,6 +96,32 @@ void onKeyboard(unsigned char key, int x, int y) {
 	glutPostRedisplay();
 }
 
+void onKeyboardUp(unsigned char key, int x, int y) {
+	switch (key) {
+	case '5':
+		upThetaState = 0;
+		break;
+	case '2':
+		upThetaState = 0;
+		break;
+		break;
+	case '4':
+		upThetaState = 0;
+		break;
+	case '6':
+		upThetaState = 0;
+		break;
+	default:
+		upTheta = 0;
+		break;
+	}
+
+	if (smallBladeSpeed > 20) smallBladeSpeed = 20;
+	else if (smallBladeSpeed < 0) smallBladeSpeed = 0;
+	if (upTheta > thetaAngle) upTheta = thetaAngle;
+	else if (upTheta < -thetaAngle) upTheta = -thetaAngle;
+	glutPostRedisplay();
+}
 
 void onSpecialKey(int key, int x, int y) {
 	switch (key) {
@@ -134,6 +170,8 @@ void onMotion(int x, int y) {
 }
 
 #pragma endregion
+
+#pragma region drawTailFunc
 
 void drawCameraLens() {
 	Mesh camLens;
@@ -265,6 +303,21 @@ void drawHeliTail() {
 	
 }
 
+void setUpTheta() {
+	if (upThetaState == 0) {
+		if (upTheta < 0) upTheta += 0.1;
+		else upTheta -= 0.1;
+	}
+	else if (upThetaState > 0){
+		upTheta += 0.2;
+	}
+	else upTheta -= 0.2;
+
+	if (upTheta > thetaAngle) upTheta = thetaAngle;
+	else if (upTheta < -thetaAngle) upTheta = -thetaAngle;
+}
+#pragma endregion
+
 void myDisplay() {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -322,12 +375,16 @@ void myDisplay() {
 	//drawCameraLens();
 	drawAxis();
 
+	setUpTheta();
+
 	glTranslatef(L.x, L.y, L.z);
 	glRotatef(theta, 0, 1, 0);
+	glRotatef(-upTheta, 1, 0, 0);
 	drawHeliTail();
 
 	glFlush();
 	glutSwapBuffers();
+	//upTheta = 0;
 }
 
 
@@ -341,13 +398,15 @@ int main(int argc, CHAR* argv[]) {
 
 	glutDisplayFunc(myDisplay);
 	glutTimerFunc(5, processTimer, 5);
-	glutKeyboardFunc(onKeyboard);
+	glutKeyboardFunc(onKeyboardDown);
+	glutKeyboardUpFunc(onKeyboardUp);
 	glutSpecialFunc(onSpecialKey);
 	glutReshapeFunc(onReshape);
 	glutMotionFunc(onMotion);
 	glutMouseFunc(onMouseDown);
 
 	L.set(0, 0, 0);
+	theta = upTheta = 0;
 
 	glutMainLoop();
 	return 0;
