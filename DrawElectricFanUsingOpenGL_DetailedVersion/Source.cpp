@@ -626,7 +626,11 @@ void myDisplay() {
 	glClearColor(1, 1, 1, 1);
 	glViewport(0, 0, screenWidth, screenHeight);
 	if (isHelicopterView) {
-		gluLookAt(-L.x * 2, L.y + sin(upTheta*DEG2RAD), -L.z * 2, L.x, L.y, L.z, 0, 1, 0);
+		gluLookAt(
+			L.x > 0 ? L.x - 1 : L.x + 1, 
+			L.y + 6 + sin(upTheta*DEG2RAD), 
+			L.z > 0 ? L.z - 1 : L.z + 1,
+			L.x, L.y, L.z, 0, 1, 0);
 	}
 	else gluLookAt(eyeX, eyeY, eyeZ, 0, 0, 0, 0, 1, 0);
 
