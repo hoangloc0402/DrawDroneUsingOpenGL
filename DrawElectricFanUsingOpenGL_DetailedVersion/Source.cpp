@@ -20,12 +20,14 @@ int		screenHeight = 800;
 Texture floorTex;
 
 int o_x, o_y;
-float eyeX, eyeY, eyeZ;
+float eyeX = 4;
+float eyeY = 4;
+float eyeZ = 4;
 float alpha = 45;
 float beta = 45;
 float deltaAngle = 5;
-float dR = 0.2;
-float Radius = 4;
+float dR = 0.5;
+float Radius = 6;
 
 Point3 L;
 float theta, upTheta;
