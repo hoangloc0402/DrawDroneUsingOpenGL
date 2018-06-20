@@ -47,7 +47,7 @@ void setMaterial(material myMaterial) {
 		float mat_ambient[] = { 0.25f, 0.25f, 0.25f, 1.0f };
 		float mat_diffuse[] = { 0.4f, 0.4f, 0.4f, 1.0f };
 		float mat_specular[] = { 0.774597f, 0.774597f, 0.774597f, 1.0f };
-		float shine = 1.8f;
+		float shine = 0.1f;
 		applyMaterial(mat_ambient, mat_diffuse, mat_specular, shine);
 		break;
 	}
@@ -103,7 +103,7 @@ void setMaterial(material myMaterial) {
 		float mat_ambient[] = { 0.23125f, 0.23125f, 0.23125f, 1.0f };
 		float mat_diffuse[] = { 0.2775f, 0.2775f, 0.2775f, 1.0f };
 		float mat_specular[] = { 0.773911f, 0.773911f, 0.773911f, 1.0f };
-		float shine = 1.6f;
+		float shine = 0.1f;
 		applyMaterial(mat_ambient, mat_diffuse, mat_specular, shine);
 		break;
 	}
@@ -127,7 +127,7 @@ void setMaterial(material myMaterial) {
 		float mat_ambient[] = { 0.05375f, 0.05f, 0.06625f, 0.82f };
 		float mat_diffuse[] = { 0.18275f, 0.17f, 0.22525f, 0.82f };
 		float mat_specular[] = { 0.332741f, 0.328634f, 0.346435f, 0.82f };
-		float shine = 3.4f;
+		float shine = .1f;
 		applyMaterial(mat_ambient, mat_diffuse, mat_specular, shine);
 		break;
 	}
@@ -151,7 +151,7 @@ void setMaterial(material myMaterial) {
 		float mat_ambient[] = { 0.1f, 0.18725f, 0.1745f, 0.8f };
 		float mat_diffuse[] = { 0.396f, 0.74151f, 0.69102f, 0.8f };
 		float mat_specular[] = { 0.297254f, 0.30829f, 0.306678f, 0.8f };
-		float shine = 1.8f;
+		float shine = 0.1f;
 		applyMaterial(mat_ambient, mat_diffuse, mat_specular, shine);
 		break;
 	}

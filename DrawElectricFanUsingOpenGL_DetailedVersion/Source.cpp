@@ -13,20 +13,19 @@
 using namespace std;
 
 GLfloat angle;
-int		screenWidth = 800;
-int		screenHeight = 800;
-//int smallBladeSpeed = 0;
+int		screenWidth = 900;
+int		screenHeight = 900;
 
 Texture floorTex;
 
 int o_x, o_y;
 float eyeX = 4;
-float eyeY = 4;
+float eyeY = 5; 
 float eyeZ = 4;
 float alpha = 45;
 float beta = 45;
 float deltaAngle = 5;
-float dR = 0.5;
+float dR = 0.2;
 float Radius = 6;
 
 Point3 L;
@@ -66,6 +65,18 @@ void processTimer(int value) {
 
 void onKeyboardDown(unsigned char key, int x, int y) {
 	switch (key) {
+	case 'q':
+		L.z += 0.5*cos(theta*DEG2RAD);
+		L.x += 0.5*sin(theta*DEG2RAD);
+		upThetaState = -1;
+		theta += 4;
+		break;
+	case 'w':
+		L.z += 0.5*cos(theta*DEG2RAD);
+		L.x += 0.5*sin(theta*DEG2RAD);
+		upThetaState = -1;
+		theta -= 4;
+		break;
 	case '+':
 		isRotatingBlade = true;
 		//smallBladeSpeed += 2;
@@ -236,7 +247,8 @@ void drawTailFanBox() {
 		glTranslatef(0, 0.15, 0);
 		tailFanPivot.Draw();
 
-		glRotatef(angle/2, 0 ,1, 0);
+		if (fanSpeed < maxFanSpeed)
+			glRotatef(-angle, 0, 1, 0);
 		for (int i = 0; i < 360; i += 45)
 			drawTailFanBlade(i);
 	}
@@ -244,6 +256,7 @@ void drawTailFanBox() {
 }
 
 void drawTailPivot() {
+	setMaterial(chrome);
 	Mesh bigTailPivot, smallTailPivot;
 	bigTailPivot.CreateEclipseCylinder(2.5, 36, 0.18, 0.15);
 	smallTailPivot.CreateEclipseCylinder(2.5, 36, 0.1, 0.05);
@@ -361,7 +374,7 @@ void DrawHeliBody() {
 	heliRightWindow.CalculateFacesNorm();
 	heliLeftWindow.CreateWindowLeft(numVertexEachEdge, alpha);
 	heliLeftWindow.CalculateFacesNorm();
-	setMaterial(copper);
+	setMaterial(obsidian);
 	glPushMatrix();
 	glTranslatef(0, 0.05, 3);
 	glTranslatef(0, -0.5, 11 * 0.55*0.6);
@@ -455,7 +468,7 @@ void drawSkidHead() {
 }
 
 void drawSkids() {
-	setMaterial(polishedsilver);
+	setMaterial(silver);
 
 	glPushMatrix();
 	glRotatef(180, 0, 0, 1);
@@ -595,7 +608,7 @@ void setUpAngle() {
 }
 
 void loadTextures(void) {
-	char texFile[12] = "grass.tga";
+	char texFile[12] = "map.tga";
 	bool status = LoadTGA(&floorTex, texFile);
 	if (status) {
 		glGenTextures(1, &floorTex.texID);
@@ -629,9 +642,9 @@ void myDisplay() {
 	glViewport(0, 0, screenWidth, screenHeight);
 	if (isHelicopterView) {
 		gluLookAt(
-			L.x > 0 ? L.x - 1 : L.x + 1, 
+			L.x > 0 ? L.x - 2 : L.x + 2, 
 			L.y + 6 + sin(upTheta*DEG2RAD), 
-			L.z > 0 ? L.z - 1 : L.z + 1,
+			(L.z > 0 ? L.z - 2 : L.z + 2) + 4,
 			L.x, L.y, L.z, 0, 1, 0);
 	}
 	else gluLookAt(eyeX, eyeY, eyeZ, 0, 0, 0, 0, 1, 0);
@@ -650,7 +663,7 @@ void myDisplay() {
 	glDisable(GL_TEXTURE_2D);
 	glEnable(GL_LIGHTING);
 
-		#pragma region Light
+	#pragma region Light
 
 	//GLfloat	lightDiffuse[] = { 0.6f,  0.6f,  0.6f,  1.0f };
 	//GLfloat	lightSpecular[] = { 0.6f,  0.6f,  0.6f,  1.0f };
@@ -663,31 +676,32 @@ void myDisplay() {
 	//glEnable(GL_LIGHTING);
 	//glEnable(GL_LIGHT0);
 
-	GLfloat	lightDiffuse1[] = {0.7f,  0.7f,  0.7f,  0.2f };
-	GLfloat	lightSpecular1[] = { 0.7f,  0.7f,  0.7f,  0.8f };
+	GLfloat	lightDiffuse1[] = {0.2f,  0.2f,  0.2f,  0.2f };
+	GLfloat	lightSpecular1[] = { 0.2f,  0.2f,  0.2f,  0.3f };
 	GLfloat	lightAmbient1[] = { 0.4f,  0.4f,  0.4f,  0.6f };
-	GLfloat light_position1[] = { 60.0f, 0.0f, 0.0f, 0.3f };
+	GLfloat light_position1[] = { 60.0f, 60.0f, 0.0f, 0.3f };
 	glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
 	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
 	glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular1);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT1);
-
 	GLfloat	lightDiffuse2[] = { 0.3f,  0.3f, 0.3f,  0.5f };
 	GLfloat	lightSpecular2[] = { 0.3f,  0.3f, 0.3f,  .2f };
 	GLfloat	lightAmbient2[] = { 0.4f,  0.4f,  0.4f,  0.3f };
-	GLfloat light_position2[] = { 0.0f, 60.0f, 0.0f, 0.8f };
+	GLfloat light_position2[] = { 0.0f, 60.0f, 60.0f, 0.3f };
 	glLightfv(GL_LIGHT2, GL_POSITION, light_position2);
 	glLightfv(GL_LIGHT2, GL_DIFFUSE, lightDiffuse2);
 	glLightfv(GL_LIGHT2, GL_AMBIENT, lightAmbient2);
 	glLightfv(GL_LIGHT2, GL_SPECULAR, lightSpecular2);
 	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT1);
+
+	
+	//glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT2);
 
 #pragma endregion
 
-	drawAxis();
+	//drawAxis();
 
 	setUpAngle();
 	glTranslatef(L.x, L.y, L.z);
@@ -713,6 +727,7 @@ void myDisplay() {
 		glTranslatef(0, 2.2, -0.2);
 		glScalef(0.25, 0.25, 0.25);
 		glRotatef(90, 0, 1, 0);
+		setMaterial(cyanplastic);
 		drawHeliMachine();
 		if (fanSpeed < maxFanSpeed)
 			glRotatef(angle*5, 0, 1, 0);
@@ -720,11 +735,11 @@ void myDisplay() {
 	}
 	glPopMatrix();
 
-	//glPushMatrix(); {
+	////glPushMatrix(); {
 		glTranslatef(0, 1.65, -3.9);
 		drawHeliTail();
-	//}
-	//glPopMatrix();
+	////}
+	////glPopMatrix();
 
 	glutSwapBuffers();
 	glFlush();
@@ -737,7 +752,7 @@ int main(int argc, CHAR* argv[]) {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(screenWidth, screenHeight);
 	glutInitWindowPosition(50, 50);
-	glutCreateWindow("Draw Electric Fan");
+	glutCreateWindow("Draw Helicopter");
 
 	glutDisplayFunc(myDisplay);
 	glutTimerFunc(5, processTimer, 5);
